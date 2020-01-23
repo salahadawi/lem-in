@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/01/08 18:10:28 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/01/23 18:12:13 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,5 +175,7 @@ char				*ft_itoa_double(long double d, int precision);
 char				*ft_chartostr(char c);
 
 long				ft_atoilong(const char *str);
+
+char				*ft_strjoinfree(char *s1, char *s2);
 
 #endif

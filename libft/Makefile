@@ -6,7 +6,7 @@
 #    By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 18:05:28 by sadawi            #+#    #+#              #
-#    Updated: 2020/01/09 17:02:47 by sadawi           ###   ########.fr        #
+#    Updated: 2020/01/23 18:11:39 by sadawi           ###   ########.fr        #
 #                                                                              #
 #******************************************************************************#
 
@@ -27,7 +27,7 @@ ft_foreach.c ft_putlong.c ft_ulonglen.c ft_putulong.c ft_itoa_base.c \
 ft_itoa_base_low.c ft_itoa_base_ul.c ft_itoa_base_ul_low.c ft_putdouble.c \
 ft_itoa_double.c ft_chartostr.c ft_printf.c handle_digit_datatypes.c \
 handle_string_datatypes.c handle_flags.c handle_format_flags.c handle_width.c \
-handle_char.c ft_atoilong.c get_next_line.c
+handle_char.c ft_atoilong.c get_next_line.c ft_strjoinfree.c
 
 OBJS = *.o
 
