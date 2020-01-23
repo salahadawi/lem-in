@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 15:33:02 by sadawi            #+#    #+#             */
-/*   Updated: 2019/10/23 16:38:37 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/01/23 18:09:53 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,6 +17,8 @@ char	*ft_strcat(char *s1, const char *s2)
 
 	i = 0;
 	j = 0;
+	if (!s2)
+		return (s1);
 	while (s1[i])
 		i++;
 	while (s2[j])

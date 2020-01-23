@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 14:01:13 by sadawi            #+#    #+#             */
-/*   Updated: 2019/10/23 16:36:25 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/01/23 18:09:30 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@ char	*ft_strcpy(char *dst, const char *src)
 	int i;
 
 	i = 0;
+	if (!src)
+		return (dst);
 	while (src[i])
 	{
 		dst[i] = src[i];
