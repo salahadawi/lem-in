@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/01/24 17:22:06 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/01/24 18:31:47 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,24 +19,97 @@ int		handle_error(int error_code)
 	return (1);
 }
 
-int		check_ants_amount(char *str)
+int		check_ants_amount(char *line)
 {
 	int i;
 
 	i = 0;
-	while (str[i])
-		if (!ft_isdigit(str[i++]))
+	while (line[i])
+		if (!ft_isdigit(line[i++]))
 			return (0);
-	if (ft_atoilong(str) > 2147483647)
+	if (ft_atoilong(line) > 2147483647)
 		return (0);
 	return (1);
 }
 
-int		check_file(char **file)
+int		check_line_comment(char *line)
 {
-	if (!check_ants_amount(file[0]))
+	return (line[0] == '#');
+}
+
+int		check_line_command(char *line)
+{
+	if (!line[0])
+		return (0);
+	return (line[0] == '#' && line[1] == '#');
+}
+
+int		check_line_link(char *line)
+{
+	int i;
+
+	i = 0;
+	while (line[i] != '-' && line[i])
+		i++;
+	if (line[i++] != '-')
+		return (0);
+	if (!line[i])
 		return (0);
 	return (1);
+}
+
+int		check_line_room(char *line)
+{
+	int i;
+
+	i = 0;
+	while (line[i] != ' ' && line[i])
+		i++;
+	if (line[i++] != ' ')
+		return (0);
+	if (ft_atoilong(&line[i]) > 2147483647)
+		return (0);
+	if (line[i] == '-')
+		i++;
+	while (ft_isdigit(line[i]))
+		i++;
+	if (line[i++] != ' ')
+		return (0);
+	if (ft_atoilong(&line[i]) > 2147483647)
+		return (0);
+	if (line[i] == '-')
+		i++;
+	while (ft_isdigit(line[i]))
+		i++;
+	if (!line[i])
+		return (1);
+	return (0);
+}
+
+
+int		check_file(char **file)
+{
+	int i;
+
+	i = 1;
+	if (!check_ants_amount(file[0]))
+		return (0);
+	while (file[i])
+	{
+		if (!check_line_room(file[i]) && !check_line_command(file[i])
+			&& !check_line_comment(file[i]))
+			break ;
+		i++;
+	}
+	while (file[i])
+	{
+		if (!check_line_link(file[i]) && !check_line_comment(file[i]))
+			break ;
+		i++;
+	}
+	if (!file[i])
+		return (1);
+	return (0);
 }
 
 char	**save_input(void)
@@ -69,3 +142,6 @@ int	main(void)
 		ft_printf("%s\n", file[i++]);
 	return (0);
 }
+
+//Need to check if room exists
+//Need to check if input contains empty lines and return error
