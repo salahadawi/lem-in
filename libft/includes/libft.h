@@ -6,13 +6,15 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/01/23 18:12:13 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/02/21 16:30:48 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef LIBFT_H
 # define LIBFT_H
 # include <string.h>
+# include "get_next_line.h"
+# include "ft_printf.h"
 
 typedef struct		s_list
 {
@@ -177,5 +179,9 @@ char				*ft_chartostr(char c);
 long				ft_atoilong(const char *str);
 
 char				*ft_strjoinfree(char *s1, char *s2);
+
+int					ft_isdigit_neg(char *str);
+
+char				*ft_strcatfree(char *s1, const char *s2);
 
 #endif

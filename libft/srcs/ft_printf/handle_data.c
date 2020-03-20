@@ -1,45 +1,44 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   handle_char.c                                      :+:      :+:    :+:   */
+/*   handle_data.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/11/06 14:26:55 by sadawi            #+#    #+#             */
-/*   Updated: 2020/01/08 15:57:34 by sadawi           ###   ########.fr       */
+/*   Updated: 2019/12/17 18:45:54 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 #include "libft.h"
 
-void	handle_char_minus(char **output, char *padding)
+t_data	*join_data(t_data *data1, t_data *data2)
 {
-	*output = ft_strjoin("a", padding);
-	(*output)[0] = '\0';
+	t_data *new_data;
+
+	new_data = (t_data*)malloc(sizeof(t_data));
+	new_data->amount = data1->amount + data2->amount;
+	new_data->output = ft_strjoin(data1->output, data2->output);
+	free(data1);
+	free(data2);
+	return (new_data);
 }
 
-int		handle_char_width(char **output, char *flag, int width)
+void	init_data(t_data **data)
 {
-	if (ft_strchr(flag, 'c'))
-		if (!(**output) && width > 1)
-			return (--width);
-	return (width);
+	*data = (t_data*)malloc(sizeof(t_data));
+	(*data)->amount = 0;
 }
 
-int		handle_char_output(char **output, char *flag)
+char	*join_char_to_str(char *str, char c)
 {
-	int width;
-	int i;
+	char *newstr;
 
-	i = 0;
-	width = 1;
-	while (ft_strchr("#0-+ ", flag[i]))
-		i++;
-	if (ft_isdigit(flag[i]))
-		width = ft_atoi(flag + i);
-	i = 0;
-	while (width > i)
-		ft_putchar((*output)[i++]);
-	return (width);
+	newstr = (char*)malloc(ft_strlen(str) + 2);
+	ft_strclr(newstr);
+	newstr = ft_strcpy(newstr, str);
+	newstr[ft_strlen(newstr)] = c;
+	free(str);
+	return (newstr);
 }
