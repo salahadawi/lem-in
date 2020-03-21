@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/25 14:36:30 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/21 15:35:56 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/21 16:55:49 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,7 +60,10 @@ int			find_nl(t_fd **buf)
 		if (!extend_buf((*buf)->fd, &(*buf)->str))
 		{
 			if (ft_strequ((*buf)->str, ""))
+			{
+				free((*buf)->str);
 				return (1);
+			}
 			return (0);
 		}
 	return (0);
