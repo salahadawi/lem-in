@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/21 18:26:30 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/21 21:15:53 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -156,35 +156,84 @@ char	*join_input(char *s1, char *s2)
 	return (str);
 }
 
-char	**save_input(void)
+void	file_append(t_file *file, t_file **new)
 {
-	char **file;
-	char *input;
-	char *line;
+	file->next = *new;
+}
 
-	input = ft_strnew(0);
+t_file	*file_new(char *line)
+{
+	t_file *file;
+
+	if (!(file = (t_file*)ft_memalloc(sizeof(t_file))))
+		handle_error(2);
+	file->next = NULL;
+	if (!(file->line = ft_strnew(ft_strlen(line))))
+		handle_error(2);
+	file->line = ft_strdup(line);
+	return (file);
+}
+
+t_file	*save_input(int *size)
+{
+	char *line;
+	t_file *first;
+	t_file *tmp;
+	
+	first = NULL;
+	tmp = NULL;
+	*size = 0;
 	while (get_next_line(0, &line) > 0)
 	{
-		if (!(input = join_input(input, line)))
-			handle_error(2);
+		if (tmp)
+		{
+			tmp->next = file_new(line);
+			tmp = tmp->next;
+		}
+		else
+			tmp = file_new(line);
+		if (!first)
+			first = tmp;
+		(*size)++;
 	}
-	file = ft_strsplit(input, '\n');
-	free(input);
-	return (file);
+	ft_printf("%d", *size);
+	tmp->next = NULL;
+	return (first);
+}
+
+char	**list_to_arr(t_file *file, int size)
+{
+	char	**new_file;
+	int		i;
+	
+	if (!(new_file = (char**)malloc(sizeof(char*) * (size + 1))))
+		handle_error(2);
+	i = 0;
+	while (file)
+	{
+		new_file[i++] = file->line;
+		file = file->next;
+	}
+	new_file[i] = 0;
+	return (new_file);
 }
 
 int	main(void)
 {
-	char **file;
-	int i;
-
-	i = 0;
-	file = save_input();
+	t_file	*file;
+	char	**file2;
+	int		size;
+	int		i;
+	
+	file = save_input(&size);
 	//if (!check_file(file))
 		//return (handle_error(1));
-	while (file[i])
+	file2 = list_to_arr(file, size);
+	i = 0;
+	while (file2[i])
 	{
-		ft_printf("%s\n", file[i++]);
+		ft_printf("%s\n", file2[i]);
+		i++;
 	}
 	return (0);
 }
