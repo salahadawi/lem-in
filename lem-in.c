@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/22 17:20:12 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/22 17:56:50 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,6 @@ int		check_line_room(char *line)
 	return (0);
 }
 
-
 void	check_file(char **file)
 {
 	int i;
@@ -157,6 +156,7 @@ char	**save_input(void)
 	first = NULL;
 	tmp = NULL;
 	size = 0;
+	save_ants_amount(); // add functions here
 	while (get_next_line(0, &line) > 0)
 	{
 		if (tmp)
@@ -205,8 +205,5 @@ int	main(void)
 	return (0);
 }
 
-//Need to check if room exists
-//Need to check if input contains empty lines and return error
 //Remember to free file after everything
 //Maybe should learn more about optimal file reading and parsing?
-//Room name can not start with L

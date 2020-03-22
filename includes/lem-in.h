@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/22 17:13:06 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/22 17:55:24 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,10 +37,10 @@ typedef	struct		s_link
 
 typedef	struct		s_farm
 {
+	int				ants_amount;
 	t_room			*start;
 	t_room			*end;
 	t_room			first;
 }					t_farm;
-
 
 #endif
