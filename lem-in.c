@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/22 13:26:46 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/22 17:20:53 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -203,8 +203,8 @@ int	main(void)
 	char	**file;
 	
 	file = save_input();
-	//if (!check_file(file))
-		//return (handle_error(1));
+	if (!check_file(file))
+		return (handle_error(1));
 	print_file(file);
 	free_file(file);
 	return (0);
