@@ -6,37 +6,35 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/22 13:26:46 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/22 17:08:32 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/lem-in.h"
 
-int		handle_error(int code)
+int		handle_error(char *message)
 {
-	if (code == 1)
-		ft_printf("Error: File is invalid.\n");
-	else if (code == 2)
-		ft_printf("Error: Malloc failed.\n");
+	ft_printf("%s\n", message);
 	exit(0);
 }
 
-int		check_ants_amount(char *line)
+void	check_ants_amount(char *line)
 {
 	int i;
 
 	i = 0;
 	while (line[i])
 		if (!ft_isdigit(line[i++]))
-			return (0);
+			handle_error("Error: Ants amount is not a positive integer.");
 	if (ft_atoilong(line) > 2147483647)
-		return (0);
-	return (1);
+		handle_error("Error: The amount of ants exceeds INT_MAX.");
 }
 
 int		check_line_comment(char *line)
 {
-	return (line[0] == '#');
+	if (!line[0])
+		return (0);
+	return (line[0] == '#' && line[1] != '#');
 }
 
 int		check_line_command(char *line)
@@ -89,13 +87,12 @@ int		check_line_room(char *line)
 }
 
 
-int		check_file(char **file)
+void	check_file(char **file)
 {
 	int i;
 
 	i = 1;
-	if (!check_ants_amount(file[0]))
-		return (0);
+	check_ants_amount(file[0]);
 	while (file[i])
 	{
 		if (!check_line_room(file[i]) && !check_line_command(file[i])
@@ -109,9 +106,8 @@ int		check_file(char **file)
 			break ;
 		i++;
 	}
-	if (!file[i])
-		return (1);
-	return (0);
+	if (file[i])
+		handle_error("The file is invalid.");
 }
 
 t_file	*file_new(char *line)
@@ -119,7 +115,7 @@ t_file	*file_new(char *line)
 	t_file *file;
 
 	if (!(file = (t_file*)ft_memalloc(sizeof(t_file))))
-		handle_error(2);
+		handle_error("Error: Malloc failed.");
 	file->next = NULL;
 	file->line = line;
 	return (file);
@@ -140,7 +136,7 @@ char	**list_to_arr(t_file *file, int size)
 	int		i;
 	
 	if (!(new_file = (char**)ft_memalloc(sizeof(char**) * (size + 1))))
-		handle_error(2);
+		handle_error("Error: Malloc failed.");
 	i = 0;
 	while (file)
 	{
@@ -203,8 +199,7 @@ int	main(void)
 	char	**file;
 	
 	file = save_input();
-	//if (!check_file(file))
-		//return (handle_error(1));
+	check_file(file);
 	print_file(file);
 	free_file(file);
 	return (0);
@@ -214,3 +209,4 @@ int	main(void)
 //Need to check if input contains empty lines and return error
 //Remember to free file after everything
 //Maybe should learn more about optimal file reading and parsing?
+//Room name can not start with L
