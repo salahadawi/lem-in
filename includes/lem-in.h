@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/22 21:30:05 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/23 21:47:25 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ typedef	struct 		s_room
 	char			*name;
 	int				x;
 	int				y;
-	char			*next;
+	struct s_room	*next;
 	struct s_link	*links;
 }					t_room;
 

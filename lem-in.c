@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/23 18:58:05 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/23 22:36:29 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -151,7 +151,7 @@ char	**list_to_arr(t_file *file, int size)
 
 void	save_ants_amount(t_farm **farm)
 {
-	char **line;
+	char *line;
 
 	if (get_next_line(0, &line) != 1)
 		handle_error("The file is invalid.");
@@ -160,11 +160,22 @@ void	save_ants_amount(t_farm **farm)
 	free(line);
 }
 
-int		get_line_room(t_farm **farm, t_room **room, char *line)
+t_room	*new_room(void)
+{
+	t_room *room;
+
+	room = (t_room*)malloc(sizeof(t_room));
+	room->next = NULL;
+	room->links = NULL;
+	return (room);
+}
+
+int		get_line_room(t_room **room, char *line)
 {
 	int i;
 
 	i = 0;
+	*room = new_room();
 	while (line[i] != ' ' && line[i])
 		i++;
 	if (line[i++] != ' ') // change to if (!line[i]) ??
@@ -195,41 +206,52 @@ int		save_line_room(t_farm **farm, t_room **room, char *line)
 {
 	if (*room)
 	{
-		if (!(get_line_room(farm, &(*room)->next, &line)))
+		if (!(get_line_room(&(*room)->next, line)))
+		{
+			free(*room); //this can be shortened to a new function
+			(*room)->next = NULL;
 			return (0);
+		}
 		*room = (*room)->next;
 	}
 	else
-		if (!(get_line_room(farm, room, &line)))
+	{
+		if (!(get_line_room(room, line)))
+		{
+			free(*room); //this can be shortened to a new function
+			*room = NULL;
 			return (0);
+		}
+		ft_printf("test");
+	}
 	if (!(*farm)->first)
 		(*farm)->first = *room;
 	return (1);
 }
 
-int		save_command_room(t_farm **farm, t_room **room, char *line, int command)
+int		save_command_room(t_farm **farm, t_room **room, char **line, int cmd)
 {
-	free(line);
-	get_next_line(0, &line);
+	free(*line);
+	get_next_line(0, line);
 	if (*room)
 	{
-		if (!(get_line_room(farm, &(*room)->next, line)))
+		if (!(get_line_room(&(*room)->next, *line)))
 			handle_error("Error: Command not followed by valid room.");
 		*room = (*room)->next;
 	}
 	else
-		if (!(get_line_room(farm, room, line)))
+		if (!(get_line_room(room, *line)))
 			handle_error("Error: Command not followed by valid room.");
 	if (!(*farm)->first)
 		(*farm)->first = *room;
-	if (command == START)
+	if (cmd == START)
 		(*farm)->start = *room;
-	else if (command == END)
+	else if (cmd == END)
 		(*farm)->end = *room;
 	return (1);
 }
 
-void	save_rooms(t_farm **farm)
+char	*save_rooms(t_farm **farm)
 {
 	char	*line;
 	t_room	*room;
@@ -241,17 +263,19 @@ void	save_rooms(t_farm **farm)
 		if (!check_line_comment(line))
 		{
 			
-			if ((command = check_line_command) > 0)
-				if (!save_command_room(farm, &room, line, command))
-					return ;
-			else
+			if ((command = check_line_command(line)) > 0)
 			{
+				if (!save_command_room(farm, &room, &line, command))
+					return (line);
+			}
+			else
 				if (!save_line_room(farm, &room, line))
-					return ;
-			}	
+					return (line);
 		}
 		free(line);
 	}
+	handle_error("Error: No links found in file.");
+	return (NULL);
 }
 
 void	init_farm(t_farm **farm)
@@ -262,45 +286,34 @@ void	init_farm(t_farm **farm)
 	(*farm)->first = NULL;
 }
 
-char	**save_input(void)
+t_farm	*save_input(void)
 {
-	char	*line;
-	t_file *first;
-	t_file *tmp;
-	int		size;
 	t_farm	*farm;
+	char	*line;
 	
-	first = NULL;
-	tmp = NULL;
-	size = 0;
+	(void)line; //temp
 	init_farm(&farm);
 	save_ants_amount(&farm); // add functions here
-	save_rooms(&farm);
-	save_links(&farm); // save links should continue with same input line that failed in save rooms
-	while (get_next_line(0, &line) > 0)
-	{
-		if (tmp)
-		{
-			tmp->next = file_new(line);
-			tmp = tmp->next;
-		}
-		else
-			tmp = file_new(line);
-		if (!first)
-			first = tmp;
-		size++;
-	}
-	tmp->next = NULL;
-	return (list_to_arr(first, size));
+	line = save_rooms(&farm);
+	//save_links(&farm, line); // save links should continue with same input line that failed in save rooms
+	return (farm);
 }
 
-void	print_file(char **file)
+void	print_farm(t_farm *farm)
 {
-	int i;
+	t_room *room;
 
-	i = 0;
-	while (file[i])
-		ft_printf("%s\n", file[i++]);
+	room = farm->first;
+	ft_printf("%d\n", farm->ants_amount);
+	while (room)
+	{
+		if (farm->start == room)
+			ft_printf("#start\n");
+		if (farm->end == room)
+			ft_printf("#end\n");
+		ft_printf("%s %d %d\n", room->name, room->x, room->y);
+		room = room->next;
+	}
 }
 
 void	free_file(char **file)
@@ -316,12 +329,12 @@ void	free_file(char **file)
 
 int	main(void)
 {
-	char	**file;
+	t_farm *farm;
 	
-	file = save_input();
-	check_file(file);
-	print_file(file);
-	free_file(file);
+	farm = save_input();
+	//check_file(file);
+	print_farm(farm);
+	//free_file(file);
 	return (0);
 }
 
