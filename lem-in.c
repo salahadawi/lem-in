@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/23 12:53:15 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/23 18:58:05 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,17 +33,18 @@ void	check_ants_amount(char *line)
 int		check_line_comment(char *line)
 {
 	if (line[0] == '#')
-	{
 		if (!ft_strequ(line, "##start") && !ft_strequ(line, "##end"))
 			return (1);
-	}
-		return (line[1] != '#' && line[1]);
+	return (0);
 }
 
 int		check_line_command(char *line)
 {
-	if (line[0] == '#')
-		return (line[1] == '#');
+	if (ft_strequ(line, "##start"))
+			return (START);
+	else if (ft_strequ(line, "##end"))
+			return (END);
+	return (0);
 }
 
 int		check_line_link(char *line)
@@ -159,22 +160,19 @@ void	save_ants_amount(t_farm **farm)
 	free(line);
 }
 
-
-
 int		get_line_room(t_farm **farm, t_room **room, char *line)
 {
 	int i;
 
 	i = 0;
-	if (check_line_comment(line))
-		return (1);
 	while (line[i] != ' ' && line[i])
 		i++;
-	if (line[i++] != ' ')
+	if (line[i++] != ' ') // change to if (!line[i]) ??
 		return (0);
-	
+	(*room)->name = ft_strsub(line, 0, i - 1);
 	if (ft_atoilong(&line[i]) > 2147483647)
 		return (0);
+	(*room)->x = ft_atoi(&line[i]);
 	if (line[i] == '-')
 		i++;
 	while (ft_isdigit(line[i]))
@@ -183,6 +181,7 @@ int		get_line_room(t_farm **farm, t_room **room, char *line)
 		return (0);
 	if (ft_atoilong(&line[i]) > 2147483647)
 		return (0);
+	(*room)->y = ft_atoi(&line[i]);
 	if (line[i] == '-')
 		i++;
 	while (ft_isdigit(line[i]))
@@ -190,6 +189,44 @@ int		get_line_room(t_farm **farm, t_room **room, char *line)
 	if (!line[i])
 		return (1);
 	return (0);
+}
+
+int		save_line_room(t_farm **farm, t_room **room, char *line)
+{
+	if (*room)
+	{
+		if (!(get_line_room(farm, &(*room)->next, &line)))
+			return (0);
+		*room = (*room)->next;
+	}
+	else
+		if (!(get_line_room(farm, room, &line)))
+			return (0);
+	if (!(*farm)->first)
+		(*farm)->first = *room;
+	return (1);
+}
+
+int		save_command_room(t_farm **farm, t_room **room, char *line, int command)
+{
+	free(line);
+	get_next_line(0, &line);
+	if (*room)
+	{
+		if (!(get_line_room(farm, &(*room)->next, line)))
+			handle_error("Error: Command not followed by valid room.");
+		*room = (*room)->next;
+	}
+	else
+		if (!(get_line_room(farm, room, line)))
+			handle_error("Error: Command not followed by valid room.");
+	if (!(*farm)->first)
+		(*farm)->first = *room;
+	if (command == START)
+		(*farm)->start = *room;
+	else if (command == END)
+		(*farm)->end = *room;
+	return (1);
 }
 
 void	save_rooms(t_farm **farm)
@@ -203,19 +240,17 @@ void	save_rooms(t_farm **farm)
 	{
 		if (!check_line_comment(line))
 		{
-			command = check_line_command;
+			
+			if ((command = check_line_command) > 0)
+				if (!save_command_room(farm, &room, line, command))
+					return ;
+			else
+			{
+				if (!save_line_room(farm, &room, line))
+					return ;
+			}	
 		}
-		if (room)
-		{
-			if (!(get_line_room(&farm, &room, &line)))
-				break ;
-			room = room->next;
-		}
-		else
-			if (!(room = get_line_room(&farm, &room, &line)))
-				break ;
-		if ((*farm)->first)
-			(*farm)->first = room;
+		free(line);
 	}
 }
 
@@ -241,7 +276,7 @@ char	**save_input(void)
 	init_farm(&farm);
 	save_ants_amount(&farm); // add functions here
 	save_rooms(&farm);
-	save_links(&farm);
+	save_links(&farm); // save links should continue with same input line that failed in save rooms
 	while (get_next_line(0, &line) > 0)
 	{
 		if (tmp)
