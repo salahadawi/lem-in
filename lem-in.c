@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/22 17:56:50 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/23 12:53:15 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,16 +32,18 @@ void	check_ants_amount(char *line)
 
 int		check_line_comment(char *line)
 {
-	if (!line[0])
-		return (0);
-	return (line[0] == '#' && line[1] != '#');
+	if (line[0] == '#')
+	{
+		if (!ft_strequ(line, "##start") && !ft_strequ(line, "##end"))
+			return (1);
+	}
+		return (line[1] != '#' && line[1]);
 }
 
 int		check_line_command(char *line)
 {
-	if (!line[0])
-		return (0);
-	return (line[0] == '#' && line[1] == '#');
+	if (line[0] == '#')
+		return (line[1] == '#');
 }
 
 int		check_line_link(char *line)
@@ -146,17 +148,100 @@ char	**list_to_arr(t_file *file, int size)
 	return (new_file);
 }
 
+void	save_ants_amount(t_farm **farm)
+{
+	char **line;
+
+	if (get_next_line(0, &line) != 1)
+		handle_error("The file is invalid.");
+	check_ants_amount(line);
+	(*farm)->ants_amount = ft_atoi(line);
+	free(line);
+}
+
+
+
+int		get_line_room(t_farm **farm, t_room **room, char *line)
+{
+	int i;
+
+	i = 0;
+	if (check_line_comment(line))
+		return (1);
+	while (line[i] != ' ' && line[i])
+		i++;
+	if (line[i++] != ' ')
+		return (0);
+	
+	if (ft_atoilong(&line[i]) > 2147483647)
+		return (0);
+	if (line[i] == '-')
+		i++;
+	while (ft_isdigit(line[i]))
+		i++;
+	if (line[i++] != ' ')
+		return (0);
+	if (ft_atoilong(&line[i]) > 2147483647)
+		return (0);
+	if (line[i] == '-')
+		i++;
+	while (ft_isdigit(line[i]))
+		i++;
+	if (!line[i])
+		return (1);
+	return (0);
+}
+
+void	save_rooms(t_farm **farm)
+{
+	char	*line;
+	t_room	*room;
+	int		command;
+
+	room = NULL;
+	while (get_next_line(0, &line) > 0)
+	{
+		if (!check_line_comment(line))
+		{
+			command = check_line_command;
+		}
+		if (room)
+		{
+			if (!(get_line_room(&farm, &room, &line)))
+				break ;
+			room = room->next;
+		}
+		else
+			if (!(room = get_line_room(&farm, &room, &line)))
+				break ;
+		if ((*farm)->first)
+			(*farm)->first = room;
+	}
+}
+
+void	init_farm(t_farm **farm)
+{
+	(*farm) = (t_farm*)malloc(sizeof(t_farm));
+	(*farm)->start = NULL;
+	(*farm)->end = NULL;
+	(*farm)->first = NULL;
+}
+
 char	**save_input(void)
 {
-	char *line;
+	char	*line;
 	t_file *first;
 	t_file *tmp;
 	int		size;
+	t_farm	*farm;
 	
 	first = NULL;
 	tmp = NULL;
 	size = 0;
-	save_ants_amount(); // add functions here
+	init_farm(&farm);
+	save_ants_amount(&farm); // add functions here
+	save_rooms(&farm);
+	save_links(&farm);
 	while (get_next_line(0, &line) > 0)
 	{
 		if (tmp)
