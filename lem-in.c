@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/23 22:36:29 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/23 22:57:54 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -208,8 +208,8 @@ int		save_line_room(t_farm **farm, t_room **room, char *line)
 	{
 		if (!(get_line_room(&(*room)->next, line)))
 		{
-			free(*room); //this can be shortened to a new function
-			(*room)->next = NULL;
+			free((*room)->next); //this can be shortened to a new function
+			(*room)->next = NULL; //also probably need to free the name string? can be done in get_line_room actually
 			return (0);
 		}
 		*room = (*room)->next;
@@ -222,7 +222,6 @@ int		save_line_room(t_farm **farm, t_room **room, char *line)
 			*room = NULL;
 			return (0);
 		}
-		ft_printf("test");
 	}
 	if (!(*farm)->first)
 		(*farm)->first = *room;
@@ -264,13 +263,12 @@ char	*save_rooms(t_farm **farm)
 		{
 			
 			if ((command = check_line_command(line)) > 0)
-			{
-				if (!save_command_room(farm, &room, &line, command))
-					return (line);
-			}
+				save_command_room(farm, &room, &line, command);
 			else
 				if (!save_line_room(farm, &room, line))
+				{
 					return (line);
+				}
 		}
 		free(line);
 	}
