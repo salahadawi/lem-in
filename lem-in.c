@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/24 16:07:34 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/24 20:28:09 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -318,6 +318,71 @@ void	get_line_link(char *line, char **link1, char **link2)
 	*link2 = ft_strsub(line, i, ft_strlen(&line[i]));
 }
 
+int		find_first_room_by_names(t_room **room, char *name1, char *name2)
+{
+	ft_printf("aaaa");
+	while (!ft_strequ((*room)->name, name1) && !ft_strequ((*room)->name, name2))
+	{
+		if (!*room)
+			handle_error("Room specified in links not found.");
+		*room = (*room)->next;
+	}
+	ft_printf("test");
+	if (ft_strequ((*room)->name, name1))
+		return (1);
+	else
+		return (2);	
+}
+
+void	find_room_by_name(t_room **room, char *name)
+{
+	while (!ft_strequ((*room)->name, name))
+	{
+		if (!*room)
+			handle_error("Room specified in links not found.");
+		*room = (*room)->next;
+	}
+}
+
+t_link	*new_link(t_room *room)
+{
+	t_link *link;
+
+	if (!(link = (t_link*)ft_memalloc(sizeof(t_link))))
+		handle_error("Malloc failed.");
+	link->linked_room = room;
+	link->next = NULL;
+	return (link);
+}
+
+void	link_rooms(t_room **room1, t_room **room2)
+{
+	if ((*room1)->links)
+		(*room1)->links->next = new_link(*room2);
+	else
+		(*room1)->links = new_link(*room2);
+	if ((*room2)->links)
+		(*room2)->links->next = new_link(*room1);
+	else
+		(*room2)->links = new_link(*room1);
+}
+
+void	save_links_to_rooms(t_farm **farm, char *link1, char *link2)
+{
+	t_room	*room1;
+	t_room	*room2;
+	int		first_link;
+
+	room1 = (*farm)->first;
+	first_link = find_first_room_by_names(&room1, link1, link2);
+	room2 = room1->next;
+	if (first_link == 1)
+		find_room_by_name(&room2, link2);
+	else
+		find_room_by_name(&room2, link1);
+	link_rooms(&room1, &room2);
+}
+
 void	save_links(t_farm **farm, char *line)
 {
 	char *link1;
@@ -325,6 +390,7 @@ void	save_links(t_farm **farm, char *line)
 	
 	get_line_link(line, &link1, &link2);
 	save_line_file(farm, line);
+	save_links_to_rooms(farm, link1, link2);
 	//save links
 	free(link1);
 	free(link2);
@@ -333,6 +399,7 @@ void	save_links(t_farm **farm, char *line)
 		if (!check_line_comment(line))
 			get_line_link(line, &link1, &link2);
 		save_line_file(farm, line);
+		save_links_to_rooms(farm, link1, link2);
 		//save links
 		free(link1);
 		free(link2);
