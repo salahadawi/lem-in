@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/24 13:33:00 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/24 15:19:14 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -118,8 +118,8 @@ t_file	*file_new(char *line)
 
 	if (!(file = (t_file*)ft_memalloc(sizeof(t_file))))
 		handle_error("Error: Malloc failed.");
-	file->next = NULL;
 	file->line = line;
+	file->next = NULL;
 	return (file);
 }
 
@@ -149,6 +149,23 @@ char	**list_to_arr(t_file *file, int size)
 	return (new_file);
 }
 
+void	save_line_file(t_farm **farm, char *line)
+{
+	t_file	**file;
+
+	file = &(*farm)->file_end;
+	if (*file)
+	{
+		(*file)->next = file_new(line);
+		*file = (*file)->next;
+	}
+	else
+	{
+		*file = file_new(line);
+		(*farm)->file_start = *file;
+	}
+}
+
 void	save_ants_amount(t_farm **farm)
 {
 	char *line;
@@ -157,13 +174,13 @@ void	save_ants_amount(t_farm **farm)
 		handle_error("The file is invalid.");
 	while (check_line_comment(line))
 	{
-		free(line);
+		save_line_file(farm, line);
 		if (get_next_line(0, &line) != 1)
 			handle_error("The file is invalid.");
 	}
 	check_ants_amount(line);
 	(*farm)->ants_amount = ft_atoi(line);
-	free(line);
+	save_line_file(farm, line);
 }
 
 t_room	*new_room(void)
@@ -246,7 +263,7 @@ int		save_line_room(t_farm **farm, t_room **room, char *line)
 
 int		save_command_room(t_farm **farm, t_room **room, char **line, int cmd)
 {
-	free(*line);
+	save_line_file(farm, *line);
 	get_next_line(0, line);
 	if (*room)
 	{
@@ -284,7 +301,7 @@ char	*save_rooms(t_farm **farm)
 				if (!save_line_room(farm, &room, line))
 					return (line);
 		}
-		free(line);
+		save_line_file(farm, line);
 	}
 	handle_error("Error: No links found in file.");
 	return (NULL);
@@ -293,6 +310,8 @@ char	*save_rooms(t_farm **farm)
 void	init_farm(t_farm **farm)
 {
 	(*farm) = (t_farm*)ft_memalloc(sizeof(t_farm));
+	(*farm)->file_start = NULL;
+	(*farm)->file_end = NULL;
 	(*farm)->start = NULL;
 	(*farm)->end = NULL;
 	(*farm)->first = NULL;
@@ -319,18 +338,27 @@ void	check_room_duplicates(t_farm **farm)
 	}
 }
 
+void	save_links(t_farm **farm, char **line)
+{
+	(void)farm;
+	(void)line;
+	//check links are valid
+	//save links to file
+	//save links to room->links
+}
+
 t_farm	*save_input(void)
 {
 	t_farm	*farm;
 	char	*line;
-	
+
 	(void)line; //temp
 	init_farm(&farm);
 	save_ants_amount(&farm); // add functions here
 	line = save_rooms(&farm);
 	check_room_duplicates(&farm);
 	//free(line); // tmp
-	//save_links(&farm, line); // save links should continue with same input line that failed in save rooms
+	//save_links(&farm, &line); // save links should continue with same input line that failed in save rooms
 	return (farm);
 }
 
@@ -351,10 +379,34 @@ void	print_farm(t_farm *farm)
 	}
 }
 
+void	print_file(t_file *file)
+{
+
+	while (file)
+	{
+		ft_printf("%s\n", file->line);
+		file = file->next;
+	}
+}
+
+void	free_file(t_file **file)
+{
+	t_file *tmp;
+
+	while (file)
+	{
+		tmp = (*file)->next;
+		free((*file)->line);
+		free((*file));
+		*file = tmp;
+	}
+}
+
 void	free_farm(t_farm **farm)
 {
 	t_room *tmp;
-	
+
+	free_file(&(*farm)->file_start);
 	while ((*farm)->first)
 	{
 		tmp = (*farm)->first->next;
@@ -368,11 +420,12 @@ void	free_farm(t_farm **farm)
 int	main(void)
 {
 	t_farm *farm;
-	
+
 	farm = save_input();
 	//check_file(file);
-	print_farm(farm);
-	free_farm(&farm);
+	//print_farm(farm);
+	print_file(farm->file_start);
+	//free_farm(&farm);
 	return (0);
 }
 
