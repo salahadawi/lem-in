@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/24 15:19:14 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/24 16:07:34 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int		handle_error(char *message)
 {
-	ft_fprintf(2, "%s\n", message);
+	ft_fprintf(2, "Error: %s\n", message);
 	exit(0);
 }
 
@@ -23,11 +23,13 @@ void	check_ants_amount(char *line)
 	int i;
 
 	i = 0;
+	if (!ft_atoi(line))
+		handle_error("Ants amount is not a positive integer.");
 	while (line[i])
 		if (!ft_isdigit(line[i++]))
-			handle_error("Error: Ants amount is not a positive integer.");
+			handle_error("Ants amount is not a positive integer.");
 	if (ft_atoilong(line) > 2147483647)
-		handle_error("Error: The amount of ants exceeds INT_MAX.");
+		handle_error("The amount of ants exceeds INT_MAX.");
 }
 
 int		check_line_comment(char *line)
@@ -41,9 +43,9 @@ int		check_line_comment(char *line)
 int		check_line_command(char *line)
 {
 	if (ft_strequ(line, "##start"))
-			return (START);
+		return (START);
 	else if (ft_strequ(line, "##end"))
-			return (END);
+		return (END);
 	return (0);
 }
 
@@ -61,63 +63,12 @@ int		check_line_link(char *line)
 	return (1);
 }
 
-int		check_line_room(char *line)
-{
-	int i;
-
-	i = 0;
-	while (line[i] != ' ' && line[i])
-		i++;
-	if (line[i++] != ' ')
-		return (0);
-	if (ft_atoilong(&line[i]) > 2147483647)
-		return (0);
-	if (line[i] == '-')
-		i++;
-	while (ft_isdigit(line[i]))
-		i++;
-	if (line[i++] != ' ')
-		return (0);
-	if (ft_atoilong(&line[i]) > 2147483647)
-		return (0);
-	if (line[i] == '-')
-		i++;
-	while (ft_isdigit(line[i]))
-		i++;
-	if (!line[i])
-		return (1);
-	return (0);
-}
-
-void	check_file(char **file)
-{
-	int i;
-
-	i = 1;
-	check_ants_amount(file[0]);
-	while (file[i])
-	{
-		if (!check_line_room(file[i]) && !check_line_command(file[i])
-			&& !check_line_comment(file[i]))
-			break ;
-		i++;
-	}
-	while (file[i])
-	{
-		if (!check_line_link(file[i]) && !check_line_comment(file[i]))
-			break ;
-		i++;
-	}
-	if (file[i])
-		handle_error("The file is invalid.");
-}
-
 t_file	*file_new(char *line)
 {
 	t_file *file;
 
 	if (!(file = (t_file*)ft_memalloc(sizeof(t_file))))
-		handle_error("Error: Malloc failed.");
+		handle_error("Malloc failed.");
 	file->line = line;
 	file->next = NULL;
 	return (file);
@@ -138,7 +89,7 @@ char	**list_to_arr(t_file *file, int size)
 	int		i;
 	
 	if (!(new_file = (char**)ft_memalloc(sizeof(char**) * (size + 1))))
-		handle_error("Error: Malloc failed.");
+		handle_error("Malloc failed.");
 	i = 0;
 	while (file)
 	{
@@ -268,12 +219,12 @@ int		save_command_room(t_farm **farm, t_room **room, char **line, int cmd)
 	if (*room)
 	{
 		if (!(get_line_room(&(*room)->next, *line)))
-			handle_error("Error: Command not followed by valid room.");
+			handle_error("Command not followed by valid room.");
 		*room = (*room)->next;
 	}
 	else
 		if (!(get_line_room(room, *line)))
-			handle_error("Error: Command not followed by valid room.");
+			handle_error("Command not followed by valid room.");
 	if (!(*farm)->first)
 		(*farm)->first = *room;
 	if (cmd == START)
@@ -303,7 +254,7 @@ char	*save_rooms(t_farm **farm)
 		}
 		save_line_file(farm, line);
 	}
-	handle_error("Error: No links found in file.");
+	handle_error("No links found in file.");
 	return (NULL);
 }
 
@@ -331,17 +282,62 @@ void	check_room_duplicates(t_farm **farm)
 		while (tmp)
 		{
 			if (ft_strequ(room->name, tmp->name))
-				handle_error("Error: File contains duplicate rooms.");
+				handle_error("File contains duplicate rooms.");
 			tmp = tmp->next;
 		}
 		room = room->next;
 	}
 }
 
-void	save_links(t_farm **farm, char **line)
+void	check_mandatory_commands(t_farm **farm)
 {
-	(void)farm;
-	(void)line;
+	if (!(*farm)->start)
+		handle_error("Start room has not been specified.");
+	if (!(*farm)->end)
+		handle_error("End room has not been specified.");
+}
+
+void	check_room_errors(t_farm **farm)
+{
+	check_room_duplicates(farm);
+	check_mandatory_commands(farm);
+}
+
+void	get_line_link(char *line, char **link1, char **link2)
+{
+	int i;
+
+	i = 0;
+	while (line[i] != '-' && line[i])
+		i++;
+	*link1 = ft_strsub(line, 0, i);
+	if (line[i++] != '-')
+		handle_error("File contains invalid link.");
+	if (!line[i])
+		handle_error("File contains invalid link.");
+	*link2 = ft_strsub(line, i, ft_strlen(&line[i]));
+}
+
+void	save_links(t_farm **farm, char *line)
+{
+	char *link1;
+	char *link2;
+	
+	get_line_link(line, &link1, &link2);
+	save_line_file(farm, line);
+	//save links
+	free(link1);
+	free(link2);
+	while (get_next_line(0, &line))
+	{
+		if (!check_line_comment(line))
+			get_line_link(line, &link1, &link2);
+		save_line_file(farm, line);
+		//save links
+		free(link1);
+		free(link2);
+	}
+	// check rooms exist, or check rooms exist while finding the pointers at the same time
 	//check links are valid
 	//save links to file
 	//save links to room->links
@@ -356,9 +352,8 @@ t_farm	*save_input(void)
 	init_farm(&farm);
 	save_ants_amount(&farm); // add functions here
 	line = save_rooms(&farm);
-	check_room_duplicates(&farm);
-	//free(line); // tmp
-	//save_links(&farm, &line); // save links should continue with same input line that failed in save rooms
+	check_room_errors(&farm);
+	save_links(&farm, line); // save links should continue with same input line that failed in save rooms
 	return (farm);
 }
 
@@ -393,7 +388,7 @@ void	free_file(t_file **file)
 {
 	t_file *tmp;
 
-	while (file)
+	while (*file)
 	{
 		tmp = (*file)->next;
 		free((*file)->line);
@@ -422,10 +417,9 @@ int	main(void)
 	t_farm *farm;
 
 	farm = save_input();
-	//check_file(file);
 	//print_farm(farm);
 	print_file(farm->file_start);
-	//free_farm(&farm);
+	free_farm(&farm);
 	return (0);
 }
 
