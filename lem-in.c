@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/23 22:57:54 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/24 13:33:00 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,7 +14,7 @@
 
 int		handle_error(char *message)
 {
-	ft_printf("%s\n", message);
+	ft_fprintf(2, "%s\n", message);
 	exit(0);
 }
 
@@ -155,6 +155,12 @@ void	save_ants_amount(t_farm **farm)
 
 	if (get_next_line(0, &line) != 1)
 		handle_error("The file is invalid.");
+	while (check_line_comment(line))
+	{
+		free(line);
+		if (get_next_line(0, &line) != 1)
+			handle_error("The file is invalid.");
+	}
 	check_ants_amount(line);
 	(*farm)->ants_amount = ft_atoi(line);
 	free(line);
@@ -164,7 +170,7 @@ t_room	*new_room(void)
 {
 	t_room *room;
 
-	room = (t_room*)malloc(sizeof(t_room));
+	room = (t_room*)ft_memalloc(sizeof(t_room));
 	room->next = NULL;
 	room->links = NULL;
 	return (room);
@@ -182,16 +188,25 @@ int		get_line_room(t_room **room, char *line)
 		return (0);
 	(*room)->name = ft_strsub(line, 0, i - 1);
 	if (ft_atoilong(&line[i]) > 2147483647)
+	{
+		free((*room)->name);
 		return (0);
+	}
 	(*room)->x = ft_atoi(&line[i]);
 	if (line[i] == '-')
 		i++;
 	while (ft_isdigit(line[i]))
 		i++;
 	if (line[i++] != ' ')
+	{
+		free((*room)->name);
 		return (0);
+	}
 	if (ft_atoilong(&line[i]) > 2147483647)
+	{
+		free((*room)->name);
 		return (0);
+	}
 	(*room)->y = ft_atoi(&line[i]);
 	if (line[i] == '-')
 		i++;
@@ -199,6 +214,7 @@ int		get_line_room(t_room **room, char *line)
 		i++;
 	if (!line[i])
 		return (1);
+	free((*room)->name);
 	return (0);
 }
 
@@ -266,9 +282,7 @@ char	*save_rooms(t_farm **farm)
 				save_command_room(farm, &room, &line, command);
 			else
 				if (!save_line_room(farm, &room, line))
-				{
 					return (line);
-				}
 		}
 		free(line);
 	}
@@ -278,10 +292,31 @@ char	*save_rooms(t_farm **farm)
 
 void	init_farm(t_farm **farm)
 {
-	(*farm) = (t_farm*)malloc(sizeof(t_farm));
+	(*farm) = (t_farm*)ft_memalloc(sizeof(t_farm));
 	(*farm)->start = NULL;
 	(*farm)->end = NULL;
 	(*farm)->first = NULL;
+}
+
+// currently checks 4000 rooms in around 0,09 seconds, merge sort and check for
+// duplicates might be significantly faster
+void	check_room_duplicates(t_farm **farm)
+{
+	t_room *room;
+	t_room *tmp;
+
+	room = ((*farm)->first);
+	while (room)
+	{
+		tmp = room->next;
+		while (tmp)
+		{
+			if (ft_strequ(room->name, tmp->name))
+				handle_error("Error: File contains duplicate rooms.");
+			tmp = tmp->next;
+		}
+		room = room->next;
+	}
 }
 
 t_farm	*save_input(void)
@@ -293,6 +328,8 @@ t_farm	*save_input(void)
 	init_farm(&farm);
 	save_ants_amount(&farm); // add functions here
 	line = save_rooms(&farm);
+	check_room_duplicates(&farm);
+	//free(line); // tmp
 	//save_links(&farm, line); // save links should continue with same input line that failed in save rooms
 	return (farm);
 }
@@ -314,15 +351,18 @@ void	print_farm(t_farm *farm)
 	}
 }
 
-void	free_file(char **file)
+void	free_farm(t_farm **farm)
 {
-	int i;
-
-	i = 0;
-	while (file[i])
-		free(file[i++]);
-	free(file[i]);
-	free(file);
+	t_room *tmp;
+	
+	while ((*farm)->first)
+	{
+		tmp = (*farm)->first->next;
+		free((*farm)->first->name);
+		free((*farm)->first);
+		(*farm)->first = tmp;
+	}
+	free(*farm);
 }
 
 int	main(void)
@@ -332,7 +372,7 @@ int	main(void)
 	farm = save_input();
 	//check_file(file);
 	print_farm(farm);
-	//free_file(file);
+	free_farm(&farm);
 	return (0);
 }
 
