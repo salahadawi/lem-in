@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/24 20:50:20 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/24 21:10:30 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -49,20 +49,6 @@ int		check_line_command(char *line)
 	return (0);
 }
 
-int		check_line_link(char *line)
-{
-	int i;
-
-	i = 0;
-	while (line[i] != '-' && line[i])
-		i++;
-	if (line[i++] != '-')
-		return (0);
-	if (!line[i])
-		return (0);
-	return (1);
-}
-
 t_file	*file_new(char *line)
 {
 	t_file *file;
@@ -72,32 +58,6 @@ t_file	*file_new(char *line)
 	file->line = line;
 	file->next = NULL;
 	return (file);
-}
-
-void	free_and_go_to_next(t_file **file)
-{
-	t_file *prev;
-	
-	prev = *file;
-	*file = (*file)->next;
-	free(prev);
-}
-
-char	**list_to_arr(t_file *file, int size)
-{
-	char	**new_file;
-	int		i;
-	
-	if (!(new_file = (char**)ft_memalloc(sizeof(char**) * (size + 1))))
-		handle_error("Malloc failed.");
-	i = 0;
-	while (file)
-	{
-		new_file[i++] = file->line;
-		free_and_go_to_next(&file);
-	}
-	new_file[i] = 0;
-	return (new_file);
 }
 
 void	save_line_file(t_farm **farm, char *line)
@@ -429,6 +389,7 @@ t_farm	*save_input(void)
 void	print_farm(t_farm *farm)
 {
 	t_room *room;
+	t_link *link;
 
 	room = farm->first;
 	ft_printf("%d\n", farm->ants_amount);
@@ -444,10 +405,11 @@ void	print_farm(t_farm *farm)
 	room = farm->first;
 	while (room)
 	{
-		while (room->links)
+		link = room->links;
+		while (link)
 		{
-			ft_printf("%s-%s\n", room->name, room->links->room->name);
-			room->links = room->links->next;
+			ft_printf("%s-%s\n", room->name, link->room->name);
+			link = link->next;
 		}
 		room = room->next;
 	}
@@ -478,15 +440,22 @@ void	free_file(t_file **file)
 
 void	free_farm(t_farm **farm)
 {
-	t_room *tmp;
+	t_room *tmp_room;
+	t_link *tmp_link;
 
 	free_file(&(*farm)->file_start);
 	while ((*farm)->first)
 	{
-		tmp = (*farm)->first->next;
+		tmp_room = (*farm)->first->next;
+		while ((*farm)->first->links)
+		{
+			tmp_link = (*farm)->first->links->next;
+			free ((*farm)->first->links);
+			(*farm)->first->links = tmp_link;
+		}
 		free((*farm)->first->name);
 		free((*farm)->first);
-		(*farm)->first = tmp;
+		(*farm)->first = tmp_room;
 	}
 	free(*farm);
 }
