@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/24 20:46:29 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/25 22:44:58 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,5 +56,56 @@ typedef	struct 		s_ant
 	//int			moved ?? if moved this turn
 }					t_ant;
 
+void	check_ants_amount(char *line);
+
+int		check_line_comment(char *line);
+
+int		check_line_command(char *line);
+
+void	save_line_file(t_farm **farm, char *line);
+
+void	save_ants_amount(t_farm **farm);
+
+int		get_room_name(t_room **room, char *line, int *i);
+
+int		get_room_x(t_room **room, char *line, int *i);
+
+int		get_room_y(t_room **room, char *line, int *i);
+
+int		get_line_room(t_room **room, char *line);
+
+int		save_line_room(t_farm **farm, t_room **room, char *line);
+
+int		save_command_room(t_farm **farm, t_room **room, char **line, int cmd);
+
+char	*save_rooms(t_farm **farm);
+
+void	check_mandatory_commands(t_farm **farm);
+
+void	check_room_errors(t_farm **farm);
+
+void	get_line_link(char *line, char **link1, char **link2);
+
+int		find_first_room_by_names(t_room **room, char *name1, char *name2);
+
+void	find_room_by_name(t_room **room, char *name);
+
+void	link_rooms(t_room **room1, t_room **room2);
+
+void	free_links(char *link1, char *link2);
+
+void	save_links_to_rooms(t_farm **farm, char *line);
+
+void	save_links(t_farm **farm, char *line);
+
+t_farm	*save_input(void);
+
+void	print_farm(t_farm *farm);
+
+void	print_file(t_file *file);
+
+void	free_file(t_file **file);
+
+void	free_farm(t_farm **farm);
 
 #endif
