@@ -6,17 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/25 20:47:33 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/25 21:26:44 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/lem-in.h"
-
-int		handle_error(char *message)
-{
-	ft_fprintf(2, "Error: %s\n", message);
-	exit(0);
-}
 
 void	check_ants_amount(char *line)
 {
@@ -47,17 +41,6 @@ int		check_line_command(char *line)
 	else if (ft_strequ(line, "##end"))
 		return (END);
 	return (0);
-}
-
-t_file	*file_new(char *line)
-{
-	t_file *file;
-
-	if (!(file = (t_file*)ft_memalloc(sizeof(t_file))))
-		handle_error("Malloc failed.");
-	file->line = line;
-	file->next = NULL;
-	return (file);
 }
 
 void	save_line_file(t_farm **farm, char *line)
@@ -92,16 +75,6 @@ void	save_ants_amount(t_farm **farm)
 	check_ants_amount(line);
 	(*farm)->ants_amount = ft_atoi(line);
 	save_line_file(farm, line);
-}
-
-t_room	*new_room(void)
-{
-	t_room *room;
-
-	room = (t_room*)ft_memalloc(sizeof(t_room));
-	room->next = NULL;
-	room->links = NULL;
-	return (room);
 }
 
 int		get_room_name(t_room **room, char *line, int *i)
@@ -174,8 +147,8 @@ int		save_line_room(t_farm **farm, t_room **room, char *line)
 	{
 		if (!(get_line_room(&(*room)->next, line)))
 		{
-			free((*room)->next); //this can be shortened to a new function
-			(*room)->next = NULL; //also probably need to free the name string? can be done in get_line_room actually
+			free((*room)->next);
+			(*room)->next = NULL;
 			return (0);
 		}
 		*room = (*room)->next;
@@ -184,7 +157,7 @@ int		save_line_room(t_farm **farm, t_room **room, char *line)
 	{
 		if (!(get_line_room(room, line)))
 		{
-			free(*room); //this can be shortened to a new function
+			free(*room);
 			*room = NULL;
 			return (0);
 		}
@@ -238,16 +211,6 @@ char	*save_rooms(t_farm **farm)
 	}
 	handle_error("No links found in file.");
 	return (NULL);
-}
-
-void	init_farm(t_farm **farm)
-{
-	(*farm) = (t_farm*)ft_memalloc(sizeof(t_farm));
-	(*farm)->file_start = NULL;
-	(*farm)->file_end = NULL;
-	(*farm)->start = NULL;
-	(*farm)->end = NULL;
-	(*farm)->first = NULL;
 }
 
 // currently checks 4000 rooms in around 0,09 seconds, merge sort and check for
@@ -326,17 +289,6 @@ void	find_room_by_name(t_room **room, char *name)
 	}
 }
 
-t_link	*new_link(t_room *room)
-{
-	t_link *link;
-
-	if (!(link = (t_link*)ft_memalloc(sizeof(t_link))))
-		handle_error("Malloc failed.");
-	link->room = room;
-	link->next = NULL;
-	return (link);
-}
-
 void	link_rooms(t_room **room1, t_room **room2)
 {
 	t_link *link1;
@@ -402,10 +354,6 @@ void	save_links(t_farm **farm, char *line)
 			save_links_to_rooms(farm, line);
 		save_line_file(farm, line);
 	}
-	// check rooms exist, or check rooms exist while finding the pointers at the same time
-	//check links are valid
-	//save links to file
-	//save links to room->links
 }
 
 t_farm	*save_input(void)
@@ -415,10 +363,10 @@ t_farm	*save_input(void)
 
 	(void)line; //temp
 	init_farm(&farm);
-	save_ants_amount(&farm); // add functions here
+	save_ants_amount(&farm);
 	line = save_rooms(&farm);
 	check_room_errors(&farm);
-	save_links(&farm, line); // save links should continue with same input line that failed in save rooms
+	save_links(&farm, line);
 	return (farm);
 }
 
@@ -453,7 +401,6 @@ void	print_farm(t_farm *farm)
 
 void	print_file(t_file *file)
 {
-
 	while (file)
 	{
 		ft_printf("%s\n", file->line);

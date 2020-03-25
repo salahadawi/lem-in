@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/25 22:44:58 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/25 23:23:44 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,6 +56,16 @@ typedef	struct 		s_ant
 	//int			moved ?? if moved this turn
 }					t_ant;
 
+int		handle_error(char *message);
+
+t_file	*file_new(char *line);
+
+t_room	*new_room(void);
+
+t_link	*new_link(t_room *room);
+
+void	init_farm(t_farm **farm);
+
 void	check_ants_amount(char *line);
 
 int		check_line_comment(char *line);
@@ -81,6 +91,8 @@ int		save_command_room(t_farm **farm, t_room **room, char **line, int cmd);
 char	*save_rooms(t_farm **farm);
 
 void	check_mandatory_commands(t_farm **farm);
+
+void	check_room_duplicates(t_farm **farm);
 
 void	check_room_errors(t_farm **farm);
 
