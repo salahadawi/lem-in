@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/24 21:10:30 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/25 20:47:33 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -104,46 +104,68 @@ t_room	*new_room(void)
 	return (room);
 }
 
+int		get_room_name(t_room **room, char *line, int *i)
+{
+	while (line[*i] != ' ' && line[*i])
+		(*i)++;
+	if (line[(*i)++] != ' ') // change to if (!line[i]) ??
+		return (0);
+	(*room)->name = ft_strsub(line, 0, *i - 1);
+	return (1);
+}
+
+int		get_room_x(t_room **room, char *line, int *i)
+{
+	if (ft_atoilong(&line[*i]) > 2147483647)
+	{
+		free((*room)->name);
+		return (0);
+	}
+	(*room)->x = ft_atoi(&line[*i]);
+	if (line[*i] == '-')
+		(*i)++;
+	while (ft_isdigit(line[*i]))
+		(*i)++;
+	if (line[(*i)++] != ' ')
+	{
+		free((*room)->name);
+		return (0);
+	}
+	return (1);
+}
+
+int		get_room_y(t_room **room, char *line, int *i)
+{
+	if (ft_atoilong(&line[*i]) > 2147483647)
+	{
+		free((*room)->name);
+		return (0);
+	}
+	(*room)->y = ft_atoi(&line[*i]);
+	if (line[*i] == '-')
+		(*i)++;
+	while (ft_isdigit(line[*i]))
+		(*i)++;
+	if (!line[*i])
+		return (1);
+	free((*room)->name);
+	return (0);
+}
+
+
 int		get_line_room(t_room **room, char *line)
 {
 	int i;
 
 	i = 0;
 	*room = new_room();
-	while (line[i] != ' ' && line[i])
-		i++;
-	if (line[i++] != ' ') // change to if (!line[i]) ??
+	if (!(get_room_name(room, line, &i)))
 		return (0);
-	(*room)->name = ft_strsub(line, 0, i - 1);
-	if (ft_atoilong(&line[i]) > 2147483647)
-	{
-		free((*room)->name);
+	if (!(get_room_x(room, line, &i)))
 		return (0);
-	}
-	(*room)->x = ft_atoi(&line[i]);
-	if (line[i] == '-')
-		i++;
-	while (ft_isdigit(line[i]))
-		i++;
-	if (line[i++] != ' ')
-	{
-		free((*room)->name);
+	if (!(get_room_y(room, line, &i)))
 		return (0);
-	}
-	if (ft_atoilong(&line[i]) > 2147483647)
-	{
-		free((*room)->name);
-		return (0);
-	}
-	(*room)->y = ft_atoi(&line[i]);
-	if (line[i] == '-')
-		i++;
-	while (ft_isdigit(line[i]))
-		i++;
-	if (!line[i])
-		return (1);
-	free((*room)->name);
-	return (0);
+	return (1);
 }
 
 int		save_line_room(t_farm **farm, t_room **room, char *line)
@@ -317,53 +339,67 @@ t_link	*new_link(t_room *room)
 
 void	link_rooms(t_room **room1, t_room **room2)
 {
-	if ((*room1)->links)
-		(*room1)->links->next = new_link(*room2);
+	t_link *link1;
+	t_link *link2;
+
+	link1 = (*room1)->links;
+	link2 = (*room2)->links;
+	if (!link1)
+		link1 = new_link(*room2);
 	else
-		(*room1)->links = new_link(*room2);
-	if ((*room2)->links)
-		(*room2)->links->next = new_link(*room1);
+	{
+		while (link1->next)
+			link1 = link1->next;
+		link1->next = new_link(*room2);
+	}
+	if (!link2)
+		link2 = new_link(*room1);
 	else
-		(*room2)->links = new_link(*room1);
+	{
+		while (link2->next) // function to cycle link until end
+			link2 = link2->next;
+		link2->next = new_link(*room1);
+	}
+	if (!(*room1)->links)
+		(*room1)->links = link1;
+	if (!(*room2)->links)
+		(*room2)->links = link2;
 }
 
-void	save_links_to_rooms(t_farm **farm, char *link1, char *link2)
+void	free_links(char *link1, char *link2)
+{
+	free(link1);
+	free(link2);
+}
+
+void	save_links_to_rooms(t_farm **farm, char *line)
 {
 	t_room	*room1;
 	t_room	*room2;
 	int		first_link;
+	char	*name1;
+	char	*name2;
 
+	get_line_link(line, &name1, &name2);
 	room1 = (*farm)->first;
-	first_link = find_first_room_by_names(&room1, link1, link2);
+	first_link = find_first_room_by_names(&room1, name1, name2);
 	room2 = room1;
 	if (first_link == 1)
-		find_room_by_name(&room2, link2);
+		find_room_by_name(&room2, name2);
 	else
-		find_room_by_name(&room2, link1);
-	if (room1 == room2)
-		ft_printf(link1);
+		find_room_by_name(&room2, name1);
 	link_rooms(&room1, &room2);
+	free_links(name1, name2);
 }
 
 void	save_links(t_farm **farm, char *line)
 {
-	char *link1;
-	char *link2;
-	
-	get_line_link(line, &link1, &link2);
+	save_links_to_rooms(farm, line);
 	save_line_file(farm, line);
-	save_links_to_rooms(farm, link1, link2);
-	free(link1);
-	free(link2);
 	while (get_next_line(0, &line))
 	{
 		if (!check_line_comment(line))
-		{
-			get_line_link(line, &link1, &link2);
-		save_links_to_rooms(farm, link1, link2);
-		free(link1);
-		free(link2);
-		}
+			save_links_to_rooms(farm, line);
 		save_line_file(farm, line);
 	}
 	// check rooms exist, or check rooms exist while finding the pointers at the same time
