@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/29 20:34:39 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/29 20:55:56 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,7 +18,7 @@
 
 extern char *g_flags;
 
-#include "libft.h"
+#include "../libft/includes/libft.h"
 
 typedef	struct		s_file
 {

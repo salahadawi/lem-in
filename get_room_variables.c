@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 23:16:06 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/25 23:16:39 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/29 20:59:36 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,11 @@ int		get_room_x(t_room **room, char *line, int *i)
 	(*room)->x = ft_atoi(&line[*i]);
 	if (line[*i] == '-')
 		(*i)++;
+	if (!ft_isdigit(line[*i]))
+	{
+		free((*room)->name);
+		return (0);
+	}
 	while (ft_isdigit(line[*i]))
 		(*i)++;
 	if (line[(*i)++] != ' ')
@@ -67,6 +72,11 @@ int		get_room_y(t_room **room, char *line, int *i)
 	(*room)->y = ft_atoi(&line[*i]);
 	if (line[*i] == '-')
 		(*i)++;
+	if (!ft_isdigit(line[*i]))
+	{
+		free((*room)->name);
+		return (0);
+	}
 	while (ft_isdigit(line[*i]))
 		(*i)++;
 	if (!line[*i])
