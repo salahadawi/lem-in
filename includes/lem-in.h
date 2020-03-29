@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/25 23:23:44 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/29 16:24:37 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define LEM_IN_H
 # define START 1
 # define END 2
+# define MAX_INT 2147483647
 
 #include "libft.h"
 
@@ -28,7 +29,8 @@ typedef	struct 		s_room
 	char			*name;
 	int				x;
 	int				y;
-	//int			occupied; ??
+	int				occupied;
+	int				weight;
 	struct s_room	*next;
 	struct s_link	*links;
 }					t_room;
@@ -53,7 +55,7 @@ typedef	struct		s_farm
 typedef	struct 		s_ant
 {
 	t_room			*room;
-	//int			moved ?? if moved this turn
+	//int			moved ?? if moved this turn // this is probably unneeded because order is enough
 }					t_ant;
 
 int		handle_error(char *message);
