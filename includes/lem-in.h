@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/29 16:24:37 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/29 20:34:39 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,8 @@
 # define START 1
 # define END 2
 # define MAX_INT 2147483647
+
+extern char *g_flags;
 
 #include "libft.h"
 

@@ -6,11 +6,13 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 22:54:44 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/29 18:09:13 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/29 20:48:02 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "includes/lem-in.h"
+
+char *g_flags = "\0";
 
 void	enqueue(t_link **queue, t_room *new_room)
 {
@@ -98,14 +100,37 @@ void	find_weights(t_farm **farm)
 	}
 }
 
-int	main(void)
+char	*get_flags(int argc, char **argv)
+{
+	char	*flags;
+	int		i;
+	
+	flags = (char*)malloc(argc);
+	i = 1;
+	while (i < argc)
+	{
+		if (ft_strlen(argv[i]) != 2 || argv[i][0] != '-')
+		{
+			ft_fprintf(2, "Error: Invalid flag.\n");
+			exit(0);
+		}
+		flags[i - 1] = argv[i][1];
+		i++;
+	}
+	flags[i] = '\0';
+	return (flags);
+}
+
+int	main(int argc, char **argv)
 {
 	t_farm *farm;
 
+	g_flags = get_flags(argc, argv);
 	farm = save_input();
 	find_weights(&farm); //calculate and add weights to each room
 	print_farm(farm);
 	//print_file(farm->file_start);
 	free_farm(&farm);
+	free(g_flags);
 	return (0);
 }
