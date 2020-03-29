@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 20:58:02 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/25 20:59:14 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/29 16:24:46 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,6 +30,8 @@ t_room	*new_room(void)
 	room = (t_room*)ft_memalloc(sizeof(t_room));
 	room->next = NULL;
 	room->links = NULL;
+	room->weight = MAX_INT;
+	room->occupied = 0;
 	return (room);
 }
 

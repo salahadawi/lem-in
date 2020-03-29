@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 21:00:27 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/25 22:53:58 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/29 16:51:39 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ void	print_farm(t_farm *farm)
 		if (farm->end == room)
 			ft_printf("#end\n");
 		ft_printf("%s %d %d\n", room->name, room->x, room->y);
+		ft_printf("Weight: %d\n", room->weight); //debug for room weight
 		room = room->next;
 	}
 	room = farm->first;
