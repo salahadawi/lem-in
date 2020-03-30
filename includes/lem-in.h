@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/29 20:55:56 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/03/30 19:03:03 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,9 @@ typedef	struct		s_farm
 // maybe somekind of ant struct?
 typedef	struct 		s_ant
 {
+	int				number;
 	t_room			*room;
+	struct s_ant	*next;
 	//int			moved ?? if moved this turn // this is probably unneeded because order is enough
 }					t_ant;
 
