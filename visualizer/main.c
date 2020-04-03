@@ -154,6 +154,23 @@ int		check_line_room(char *line)
 	return (0);
 }
 
+void	free_links(char *link1, char *link2)
+{
+	free(link1);
+	free(link2);
+}
+
+t_link	*new_link(t_room *room)
+{
+	t_link *link;
+
+	if (!(link = (t_link*)ft_memalloc(sizeof(t_link))))
+		handle_error("Malloc failed.");
+	link->room = room;
+	link->next = NULL;
+	return (link);
+}
+
 t_room	*new_room(void)
 {
 	t_room *room;
@@ -163,6 +180,7 @@ t_room	*new_room(void)
 	room->x = 0;
 	room->y = 0;
 	room->next = NULL;
+	room->links = NULL;
 	return (room);
 }
 
@@ -209,6 +227,109 @@ void	get_line_room(t_lem_in *lem_in, t_room **room, char *line)
 		lem_in->first = (*room);
 }
 
+int		check_line_link(char *line)
+{
+	int i;
+
+	i = 0;
+	while (line[i])
+	{
+		if (line[i++] == '-')
+			return (1);
+	}
+	return (0);
+}
+
+int		find_first_room_by_names(t_room **room, char *name1, char *name2)
+{
+	while (!ft_strequ((*room)->name, name1) && !ft_strequ((*room)->name, name2))
+	{
+		*room = (*room)->next;
+		if (!*room)
+			handle_error("Room specified in links not found.");
+	}
+	if (ft_strequ((*room)->name, name1))
+		return (1);
+	else
+		return (2);	
+}
+
+void	find_room_by_name(t_room **room, char *name)
+{
+	if (ft_strequ((*room)->name, name))
+		handle_error("Links contain a room linking to itself.");
+	while (!ft_strequ((*room)->name, name))
+	{
+		*room = (*room)->next;
+		if (!*room)
+			handle_error("Room specified in links not found.");
+	}
+}
+
+void	get_line_link(char *line, char **link1, char **link2)
+{
+	int i;
+
+	i = 0;
+	while (line[i] != '-' && line[i])
+		i++;
+	*link1 = ft_strsub(line, 0, i);
+	if (line[i++] != '-')
+		handle_error("File contains invalid link.");
+	if (!line[i])
+		handle_error("File contains invalid link.");
+	*link2 = ft_strsub(line, i, ft_strlen(&line[i]));
+}
+
+void	link_rooms(t_room **room1, t_room **room2)
+{
+	t_link *link1;
+	t_link *link2;
+
+	link1 = (*room1)->links;
+	link2 = (*room2)->links;
+	if (!link1)
+		link1 = new_link(*room2);
+	else
+	{
+		while (link1->next)
+			link1 = link1->next;
+		link1->next = new_link(*room2);
+	}
+	if (!link2)
+		link2 = new_link(*room1);
+	else
+	{
+		while (link2->next) // function to cycle link until end
+			link2 = link2->next;
+		link2->next = new_link(*room1);
+	}
+	if (!(*room1)->links)
+		(*room1)->links = link1;
+	if (!(*room2)->links)
+		(*room2)->links = link2;
+}
+
+void	save_links_to_rooms(t_lem_in *lem_in, char *line)
+{
+	t_room	*room1;
+	t_room	*room2;
+	int		first_link;
+	char	*name1;
+	char	*name2;
+
+	get_line_link(line, &name1, &name2);
+	room1 = lem_in->first;
+	first_link = find_first_room_by_names(&room1, name1, name2);
+	room2 = room1;
+	if (first_link == 1)
+		find_room_by_name(&room2, name2);
+	else
+		find_room_by_name(&room2, name1);
+	link_rooms(&room1, &room2);
+	free_links(name1, name2);
+}
+
 t_file	*save_input(t_lem_in *lem_in)
 {
 	char *line;
@@ -224,6 +345,8 @@ t_file	*save_input(t_lem_in *lem_in)
 	room = NULL;
 	while (get_next_line(0, &line) > 0)
 	{
+		if (line[0] == 'L')
+			break;
 		if (check_line_room(line))
 		{
 			if (!room)
@@ -234,6 +357,10 @@ t_file	*save_input(t_lem_in *lem_in)
 				room = room->next;
 			}
 			update_min_max(lem_in, room);
+		}
+		else if (check_line_link(line))
+		{
+			save_links_to_rooms(lem_in, line);
 		}
 		file->next = file_new(line);
 		file = file->next;
@@ -291,13 +418,14 @@ int		scale(int n, int old[2], int new[2])
 
 void	scale_rooms(t_lem_in *lem_in)
 {
-	for (t_room *room = lem_in->first; room; room = room->next)
+	/*for (t_room *room = lem_in->first; room; room = room->next)
 	{
 		room->x_scaled = scale(room->x, (int[2]){lem_in->x_min, lem_in->x_max},
 		(int[2]){0, SCREEN_WIDTH});
 		room->y_scaled = scale(room->y, (int[2]){lem_in->y_min, lem_in->y_max},
 		(int[2]){0, SCREEN_HEIGHT});
-	/*for (t_room *room = lem_in->first; room; room = room->next)
+	}*/
+	for (t_room *room = lem_in->first; room; room = room->next)
 	{
 		room->x_scaled = room->x - lem_in->x_max / 2;
 		room->x_scaled = scale(room->x_scaled, (int[2]){lem_in->x_min, lem_in->x_max},
@@ -305,7 +433,6 @@ void	scale_rooms(t_lem_in *lem_in)
 		room->y_scaled = room->y - lem_in->y_max / 2;
 		room->y_scaled = scale(room->y_scaled, (int[2]){lem_in->y_min, lem_in->y_max},
 		(int[2]){0, SCREEN_HEIGHT});
-	}*/
 	}
 }
 
@@ -365,6 +492,11 @@ int	main(int argc, char **argv)
 			SDL_Rect fillRect = {room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y, 10, 10};
 			SDL_SetRenderDrawColor(sdl->renderer, 0x99, 0x99, 0x99, 0xFF);        
 			SDL_RenderFillRect(sdl->renderer, &fillRect);
+			for (t_link *link = room->links; link; link = link->next)
+			{
+				SDL_SetRenderDrawColor(sdl->renderer, 0xCC, 0xCC, 0xCC, 0x55);
+				SDL_RenderDrawLine(sdl->renderer, room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y, room->links->room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->links->room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y);
+			}
 		}
 		SDL_RenderPresent(sdl->renderer);
 	}

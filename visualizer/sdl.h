@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 18:53:51 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/03 18:23:56 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/03 22:27:20 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,14 @@ typedef	struct		s_room
 	int				x_scaled;
 	int				y_scaled;
 	struct s_room	*next;
+	struct s_link	*links;
 }					t_room;
 
+typedef	struct		s_link
+{
+	t_room			*room;
+	struct s_link	*next;
+}					t_link;
 
 typedef	struct		s_lem_in
 {
