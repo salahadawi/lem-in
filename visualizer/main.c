@@ -35,7 +35,7 @@ void	init_mods(t_mods **mods)
 {
 	if (!(*mods = (t_mods*)ft_memalloc(sizeof(t_mods))))
 		handle_error("Malloc failed");
-	(*mods)->zoom = 0.8;
+	(*mods)->zoom = 1;
 	(*mods)->offset_x = SCREEN_WIDTH / 2;
 	(*mods)->offset_y = SCREEN_HEIGHT / 2;
 }
@@ -139,6 +139,10 @@ void	load_media(t_sdl *sdl, t_lem_in *lem_in)
 			texture->next = new_texture();	
 		if (texture->next)
 			texture = texture->next;
+		if (room == lem_in->start)
+			room->name = ft_strjoinfree(room->name, ft_strdup(" ##start"));
+		if (room == lem_in->end)
+			room->name = ft_strjoinfree(room->name, ft_strdup(" ##end"));
 		load_from_rendered_text(sdl, texture, room->name, text_color);
 	}
 }
@@ -293,6 +297,7 @@ void	get_line_room(t_lem_in *lem_in, t_room **room, char *line)
 	get_room_xy(room, line, &i);
 	if (!lem_in->first)
 		lem_in->first = (*room);
+	
 }
 
 int		check_line_link(char *line)
@@ -398,42 +403,119 @@ void	save_links_to_rooms(t_lem_in *lem_in, char *line)
 	free_links(name1, name2);
 }
 
-t_file	*save_input(t_lem_in *lem_in)
+int		check_line_comment(char *line)
+{
+	if (line[0] == '#')
+		if (!ft_strequ(line, "##start") && !ft_strequ(line, "##end"))
+			return (1);
+	return (0);
+}
+
+int		check_line_command(char *line)
+{
+	if (ft_strequ(line, "##start"))
+		return (START);
+	else if (ft_strequ(line, "##end"))
+		return (END);
+	return (0);
+}
+
+void	save_ants_amount(t_lem_in *lem_in)
 {
 	char *line;
-	t_file *file;
-	t_file *first;
-	t_room	*room;
 
-
-	if (get_next_line(0, &line) < 1)
+	if (get_next_line(0, &line) != 1)
 		handle_error("Error in lem-in");
-	file = file_new(line);
-	first = file;
+	while (check_line_comment(line))
+	{
+		if (get_next_line(0, &line) != 1)
+			handle_error("Error in lem-in");
+	}
+	lem_in->ants_amount = ft_atoi(line);
+}
+
+int		save_command_room(t_lem_in *lem_in, t_room **room, char **line, int cmd)
+{
+	get_next_line(0, line);
+	if (*room)
+	{
+		get_line_room(lem_in, &(*room)->next, *line);
+		*room = (*room)->next;
+	}
+	else
+		get_line_room(lem_in, room, *line);
+	if (cmd == START)
+		lem_in->start = *room;
+	else if (cmd == END)
+		lem_in->end = *room;
+	return (1);
+}
+
+char	*save_rooms(t_lem_in *lem_in)
+{
+	t_room	*room;
+	char	*line;
+	int		command;
+
 	room = NULL;
+	while (get_next_line(0, &line) > 0)
+	{
+		if (!check_line_comment(line))
+		{
+			if ((command = check_line_command(line)) > 0)
+				save_command_room(lem_in, &room, &line, command);
+			else if (check_line_room(line))
+			{
+				if (!room)
+					get_line_room(lem_in, &room, line);
+				else
+				{
+					get_line_room(lem_in, &room->next, line);
+					room = room->next;
+				}
+				update_min_max(lem_in, room);
+			}
+			else
+				break;
+		}
+		//file->next = file_new(line);
+		//file = file->next;
+	}
+	return (line);
+}
+
+void	save_links(t_lem_in *lem_in, char *line)
+{
+
+	if (check_line_link(line))
+		save_links_to_rooms(lem_in, line);
 	while (get_next_line(0, &line) > 0)
 	{
 		if (line[0] == 'L')
 			break;
-		if (check_line_room(line))
+		if (!check_line_comment(line))
 		{
-			if (!room)
-				get_line_room(lem_in, &room, line);
-			else
-			{
-				get_line_room(lem_in, &room->next, line);
-				room = room->next;
-			}
-			update_min_max(lem_in, room);
+			if (check_line_link(line))
+				save_links_to_rooms(lem_in, line);
 		}
-		else if (check_line_link(line))
-		{
-			save_links_to_rooms(lem_in, line);
-		}
-		file->next = file_new(line);
-		file = file->next;
+		//file->next = file_new(line);
+		//file = file->next;
 	}
-	return (first);
+}
+
+t_file	*save_input(t_lem_in *lem_in)
+{
+	char *line;
+	//t_file *file; //file probably doesn't need to be saved
+	//t_file *first;
+
+
+	save_ants_amount(lem_in);
+	line = save_rooms(lem_in);
+	save_links(lem_in, line);
+	//file = file_new(line);
+	//first = file;
+	return (NULL);
 }
 
 void	print_file(t_file *file)
@@ -473,6 +555,9 @@ t_lem_in	*init_lem_in(void)
 	lem_in->x_max = MIN_INT;
 	lem_in->y_max = MIN_INT;
 	lem_in->first = NULL;
+	lem_in->start = NULL;
+	lem_in->end = NULL;
+	lem_in->ants_amount = 0;
 	return (lem_in);
 }
 
@@ -497,10 +582,10 @@ void	scale_rooms(t_lem_in *lem_in)
 	{
 		room->x_scaled = room->x - lem_in->x_max / 2;
 		room->x_scaled = scale(room->x_scaled, (int[2]){lem_in->x_min, lem_in->x_max},
-		(int[2]){0, SCREEN_WIDTH});
+		(int[2]){0, SCREEN_WIDTH / 3});
 		room->y_scaled = room->y - lem_in->y_max / 2;
 		room->y_scaled = scale(room->y_scaled, (int[2]){lem_in->y_min, lem_in->y_max},
-		(int[2]){0, SCREEN_HEIGHT});
+		(int[2]){0, SCREEN_HEIGHT / 3});
 	}
 }
 
@@ -611,6 +696,8 @@ void	normalize_distances(t_lem_in *lem_in)
 		else
 			room->x = i;
 	}
+	lem_in->x_min = 0;
+	lem_in->x_max = i;
 	i = 0;
 	mergesort(&lem_in->first, SORT_ROOM_Y);
 	//for (t_room *print = lem_in->first; print; print = print->next)
@@ -626,6 +713,8 @@ void	normalize_distances(t_lem_in *lem_in)
 		else
 			room->y = i;
 	}
+	lem_in->y_min = 0;
+	lem_in->y_max = i;
 	//change room coordinates to be next to each other
 }
 
@@ -678,25 +767,27 @@ int	main(int argc, char **argv)
 				sdl->mouse->y = y;
 			}
 		}
-
 		SDL_SetRenderDrawColor(sdl->renderer, 0x77, 0x77, 0x77, 0xFF);
 		SDL_RenderClear(sdl->renderer);
 		t_texture *texture = sdl->textures;
 		for (t_room *room = lem_in->first; room; room = room->next)
 		{
-			SDL_Rect fillRect = {room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y, 20, 20};
-			SDL_SetRenderDrawColor(sdl->renderer, 0x99, 0x99, 0x99, 0xFF);        
-			SDL_RenderFillRect(sdl->renderer, &fillRect);
-			render_texture(sdl, texture, room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y - 20);
-			texture = texture->next;
 			SDL_SetRenderDrawBlendMode(sdl->renderer, SDL_BLENDMODE_BLEND);
 			SDL_SetRenderDrawColor(sdl->renderer, 0xCC, 0xCC, 0xCC, 0x99);
 			for (t_link *link = room->links; link; link = link->next)
 			{
 				//ft_printf("link: %s-%s", room->name, link->room->name);
 				//ft_printf("link: (%d.%d) (%d.%d))\n", room->x_scaled, room->y_scaled, link->room->x_scaled, link->room->y_scaled);
-				SDL_RenderDrawLine(sdl->renderer, room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y, link->room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, link->room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y);
+				SDL_RenderDrawLine(sdl->renderer, room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x + 25 * sdl->mods->zoom, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y + 25 * sdl->mods->zoom, link->room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x + 25 * sdl->mods->zoom, link->room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y + 25 * sdl->mods->zoom);
 			}
+		}
+		for (t_room *room = lem_in->first; room; room = room->next)
+		{
+			SDL_Rect fillRect = {room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y, 50 * sdl->mods->zoom, 50 * sdl->mods->zoom};
+			SDL_SetRenderDrawColor(sdl->renderer, 0x99, 0x99, 0x99, 0xFF);
+			SDL_RenderFillRect(sdl->renderer, &fillRect);
+			render_texture(sdl, texture, room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y - 20);
+			texture = texture->next;
 		}
 		SDL_RenderPresent(sdl->renderer);
 	}

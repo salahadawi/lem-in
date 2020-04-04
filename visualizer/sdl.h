@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 18:53:51 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/04 15:06:23 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/04 19:05:16 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 # define SCREEN_HEIGHT 900
 # define MAX_INT 2147483647
 # define MIN_INT - 2147483648
+# define START 1
+# define END 2
 
 # include <SDL2/SDL.h>
 # include <SDL2/SDL_image.h>
@@ -61,6 +63,9 @@ typedef	struct			s_lem_in
 	t_room				**map;
 	t_file				*file;
 	t_room				*first;
+	t_room				*start;
+	t_room				*end;
+	int					ants_amount;
 }						t_lem_in;
 
 
