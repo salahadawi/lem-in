@@ -35,16 +35,16 @@ void	init_mods(t_mods **mods)
 {
 	if (!(*mods = (t_mods*)ft_memalloc(sizeof(t_mods))))
 		handle_error("Malloc failed");
-	(*mods)->zoom = 1;
-	(*mods)->offset_x = 0;
-	(*mods)->offset_y = 0;
+	(*mods)->zoom = 0.8;
+	(*mods)->offset_x = SCREEN_WIDTH / 2;
+	(*mods)->offset_y = SCREEN_HEIGHT / 2;
 }
 
 void	init(t_sdl *sdl)
 {
 	if (SDL_Init(SDL_INIT_VIDEO) < 0)
 		handle_error_sdl("SDL could not initialize!");
-	sdl->window = SDL_CreateWindow("Lem-in", 700, 200, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
+	sdl->window = SDL_CreateWindow("Lem-in", 100, 100, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
 	if (!sdl->window)
 		handle_error_sdl("Window could not be created!");
 	if (!(sdl->renderer = SDL_CreateRenderer(sdl->window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC)))
@@ -436,6 +436,111 @@ void	scale_rooms(t_lem_in *lem_in)
 	}
 }
 
+void	split_list(t_room *head, t_room **first_half, t_room **second_half)
+{
+	t_room *fast;
+	t_room *slow;
+
+	slow = head;
+	fast = head->next;
+	while (fast)
+	{
+		fast = fast->next;
+		if (fast)
+		{
+			slow = slow->next;
+			fast = fast->next;
+		}
+	}
+	*first_half = head;
+	*second_half = slow->next;
+	slow->next = NULL;
+}
+
+t_room	*sorted_merge_room_x(t_room *first_half, t_room *second_half)
+{
+	t_room *sorted;
+
+	if (!first_half)
+		return (second_half);
+	if (!second_half)
+		return (first_half);
+	if (first_half->x <= second_half->x)
+	{
+		sorted = first_half;
+		sorted->next = sorted_merge_room_x(first_half->next, second_half);
+	}
+	else
+	{
+		sorted = second_half;
+		sorted->next = sorted_merge_room_x(first_half, second_half->next);
+	}
+	return (sorted);
+}
+
+t_room	*sorted_merge_room_y(t_room *first_half, t_room *second_half)
+{
+	t_room *sorted;
+
+	if (!first_half)
+		return (second_half);
+	if (!second_half)
+		return (first_half);
+	if (first_half->y <= second_half->y)
+	{
+		sorted = first_half;
+		sorted->next = sorted_merge_room_y(first_half->next, second_half);
+	}
+	else
+	{
+		sorted = second_half;
+		sorted->next = sorted_merge_room_y(first_half, second_half->next);
+	}
+	return (sorted);
+}
+
+t_room	*sorted_merge(t_room *first_half, t_room *second_half, int sorting_mode)
+{
+	if (sorting_mode == SORT_ROOM_X)
+		return (sorted_merge_room_x(first_half, second_half));
+	if (sorting_mode == SORT_ROOM_Y)
+		return (sorted_merge_room_y(first_half, second_half));
+	else
+		handle_error("Invalid sort mode");
+	return NULL;
+}
+
+void	mergesort(t_room **room, int sorting_mode)
+{
+	t_room *head;
+	t_room *first_half;
+	t_room *second_half;
+
+	head = (*room);
+	if (!head || !head->next)
+		return ;
+	split_list(head, &first_half, &second_half);
+	for (t_room *print = first_half; print; print = print->next)
+		ft_printf("FIRST: %s\n", print->name);
+	for (t_room *print = second_half; print; print = print->next)
+		ft_printf("SECOND: %s\n", print->name);
+	mergesort(&first_half, sorting_mode);
+	mergesort(&second_half, sorting_mode);
+	*room = sorted_merge(first_half, second_half, sorting_mode);
+}
+
+void	normalize_distances(t_lem_in *lem_in)
+{
+	mergesort(&lem_in->first, SORT_ROOM_X);
+	for (t_room *print = lem_in->first; print; print = print->next)
+		ft_printf("SORTED_X: %s (%d.%d)\n", print->name, print->x, print->y);
+	//change room coordinates to be next to each other
+	mergesort(&lem_in->first, SORT_ROOM_Y);
+	for (t_room *print = lem_in->first; print; print = print->next)
+		ft_printf("SORTED_Y: %s (%d.%d)\n", print->name, print->x, print->y);
+	//change room coordinates to be next to each other
+}
+
 int	main(int argc, char **argv)
 {
 	t_sdl	*sdl;
@@ -450,6 +555,7 @@ int	main(int argc, char **argv)
 	load_media(sdl);
 	lem_in->file = save_input(lem_in);
 	scale_rooms(lem_in);
+	normalize_distances(lem_in);
 	//print_file(lem_in->file);
 	print_lem_in(lem_in);
 	while (1)
@@ -492,9 +598,10 @@ int	main(int argc, char **argv)
 			SDL_Rect fillRect = {room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y, 10, 10};
 			SDL_SetRenderDrawColor(sdl->renderer, 0x99, 0x99, 0x99, 0xFF);        
 			SDL_RenderFillRect(sdl->renderer, &fillRect);
+			SDL_SetRenderDrawBlendMode(sdl->renderer, SDL_BLENDMODE_BLEND);
+			SDL_SetRenderDrawColor(sdl->renderer, 0xCC, 0xCC, 0xCC, 0x99);
 			for (t_link *link = room->links; link; link = link->next)
 			{
-				SDL_SetRenderDrawColor(sdl->renderer, 0xCC, 0xCC, 0xCC, 0x55);
 				SDL_RenderDrawLine(sdl->renderer, room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y, room->links->room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->links->room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y);
 			}
 		}

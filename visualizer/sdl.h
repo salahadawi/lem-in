@@ -6,14 +6,14 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 18:53:51 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/03 22:27:20 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/04 12:40:27 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef SDL_H
 # define SDL_H
-# define SCREEN_WIDTH 640
-# define SCREEN_HEIGHT 480
+# define SCREEN_WIDTH 1600
+# define SCREEN_HEIGHT 900
 # define TEXTURES_AMOUNT 0
 # define MAX_INT 2147483647
 # define MIN_INT - 2147483648
@@ -21,6 +21,13 @@
 # include <SDL2/SDL.h>
 # include <SDL2/SDL_image.h>
 # include "../libft/includes/libft.h"
+
+enum				e_sorting_mode
+{
+	SORT_ROOM_X,
+	SORT_ROOM_Y
+};
+
 
 typedef	struct		s_file
 {
