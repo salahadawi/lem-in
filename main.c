@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 22:54:44 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/30 20:11:17 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/04 13:53:36 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -216,8 +216,8 @@ int	main(int argc, char **argv)
 	farm = save_input();
 	find_weights(&farm); //calculate and add weights to each room
 	check_links_valid(&farm);
-	print_farm(farm);
-	//print_file(farm->file_start);
+	//print_farm(farm);
+	print_file(farm->file_start); //remember to print newline before ant movements
 	move_ants(&farm); //
 	free_farm(&farm);
 	free(g_flags);
