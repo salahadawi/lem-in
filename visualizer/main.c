@@ -52,8 +52,8 @@ void	init(t_sdl *sdl)
 	sdl->img_flags = IMG_INIT_PNG;
 	if (!(IMG_Init(sdl->img_flags) & sdl->img_flags))
 		handle_error_sdl("SDL image could not initialize!");
-	for (int i = 0; i < TEXTURES_AMOUNT; i++)
-		init_texture(&sdl->textures[i]);
+	if (TTF_Init() == -1)
+		handle_error("SDL_ttf could not initialize!");
 	sdl->screen = SDL_GetWindowSurface(sdl->window);
 	init_mods(&sdl->mods);
 	init_mouse(&sdl->mouse);
@@ -68,6 +68,20 @@ void	free_texture(t_texture *texture)
 		texture->width = 0;
 		texture->height = 0;
 	}
+}
+
+void	load_from_rendered_text(t_sdl *sdl, t_texture *texture, char *text, SDL_Color text_color)
+{
+	SDL_Surface *text_surface;
+	
+	free_texture(texture);
+	if (!(text_surface = TTF_RenderText_Solid(sdl->font, text, text_color)))
+		handle_error("Unable to render text surface!");
+	if (!(texture->texture = SDL_CreateTextureFromSurface(sdl->renderer, text_surface)))
+		handle_error("Unable to create texture from rendered text!");
+	texture->width = text_surface->w;
+	texture->height = text_surface->h;
+	SDL_FreeSurface(text_surface);
 }
 
 void	texture_load_from_file(t_sdl *sdl, t_texture *texture, char *path)
@@ -93,16 +107,70 @@ void	render_texture(t_sdl *sdl, t_texture *texture, int x, int y)
 	SDL_RenderCopy(sdl->renderer, texture->texture, NULL, &render_quad);
 }
 
-void	load_media(t_sdl *sdl)
+t_texture	*new_texture(void)
 {
-	(void)sdl;
-	//texture_load_from_file(sdl, sdl->textures[0], "arrow.png");
+	t_texture *texture;
+
+	if (!(texture = (t_texture*)ft_memalloc(sizeof(t_texture))))
+		handle_error("Malloc failed.");
+	texture->texture = NULL;
+	texture->width = 0;
+	texture->height = 0;
+	texture->next = NULL;
+	return (texture);
 }
+
+void	load_media(t_sdl *sdl, t_lem_in *lem_in)
+{
+	t_texture *texture;
+
+	if (!(sdl->font = TTF_OpenFont("fonts/Action_Man.ttf", 20)))
+		handle_error("Failed to load font!");
+	SDL_Color text_color = {0, 0, 0, 0};
+	texture = NULL;
+	for (t_room *room = lem_in->first; room; room = room->next)
+	{
+		if (!texture)
+		{
+			texture = new_texture();
+			sdl->textures = texture;
+		}
+		else
+			texture->next = new_texture();	
+		if (texture->next)
+			texture = texture->next;
+		load_from_rendered_text(sdl, texture, room->name, text_color);
+	}
+}
+
+// Function to free the texture linked list
+/*void	free_texture_list(t_texture)
+{
+	t_room *tmp_room;
+	t_link *tmp_link;
+
+	free_file(&(*farm)->file_start);
+	while ((*farm)->first)
+	{
+		tmp_room = (*farm)->first->next;
+		while ((*farm)->first->links)
+		{
+			tmp_link = (*farm)->first->links->next;
+			free ((*farm)->first->links);
+			(*farm)->first->links = tmp_link;
+		}
+		free((*farm)->first->name);
+		free((*farm)->first);
+		(*farm)->first = tmp_room;
+	}
+	free(*farm);
+}*/
 
 void	close_sdl(t_sdl *sdl)
 {
-	for (int i = 0; i < TEXTURES_AMOUNT; i++)
-		free_texture(sdl->textures[i]);
+	//free_texture_list
+	TTF_CloseFont(sdl->font);
+	TTF_Quit();
 	SDL_DestroyRenderer(sdl->renderer);
 	sdl->renderer = NULL;
 	SDL_FreeSurface(sdl->image);
@@ -520,10 +588,6 @@ void	mergesort(t_room **room, int sorting_mode)
 	if (!head || !head->next)
 		return ;
 	split_list(head, &first_half, &second_half);
-	for (t_room *print = first_half; print; print = print->next)
-		ft_printf("FIRST: %s\n", print->name);
-	for (t_room *print = second_half; print; print = print->next)
-		ft_printf("SECOND: %s\n", print->name);
 	mergesort(&first_half, sorting_mode);
 	mergesort(&second_half, sorting_mode);
 	*room = sorted_merge(first_half, second_half, sorting_mode);
@@ -534,8 +598,8 @@ void	normalize_distances(t_lem_in *lem_in)
 	int i;
 
 	mergesort(&lem_in->first, SORT_ROOM_X);
-	for (t_room *print = lem_in->first; print; print = print->next)
-		ft_printf("SORTED_X: %s (%d.%d)\n", print->name, print->x, print->y);
+	//for (t_room *print = lem_in->first; print; print = print->next)
+		//ft_printf("SORTED_X: %s (%d.%d)\n", print->name, print->x, print->y);
 	i = 0;
 	for  (t_room *room = lem_in->first; room; room = room->next)
 	{
@@ -547,12 +611,10 @@ void	normalize_distances(t_lem_in *lem_in)
 		else
 			room->x = i;
 	}
-	for (t_room *print = lem_in->first; print; print = print->next)
-		ft_printf("SORTED_X: %s (%d.%d)\n", print->name, print->x, print->y);
 	i = 0;
 	mergesort(&lem_in->first, SORT_ROOM_Y);
-	for (t_room *print = lem_in->first; print; print = print->next)
-		ft_printf("SORTED_Y: %s (%d.%d)\n", print->name, print->x, print->y);
+	//for (t_room *print = lem_in->first; print; print = print->next)
+		//ft_printf("SORTED_Y: %s (%d.%d)\n", print->name, print->x, print->y);
 	i = 0;
 	for  (t_room *room = lem_in->first; room; room = room->next)
 	{
@@ -575,13 +637,13 @@ int	main(int argc, char **argv)
 	(void)argc;
 	(void)argv;
 	lem_in = init_lem_in();
-	if (!(sdl = (t_sdl*)ft_memalloc(sizeof(t_sdl))))
-		handle_error("Malloc failed");
-	init(sdl);
-	load_media(sdl);
 	lem_in->file = save_input(lem_in);
 	normalize_distances(lem_in);
 	scale_rooms(lem_in);
+	if (!(sdl = (t_sdl*)ft_memalloc(sizeof(t_sdl))))
+		handle_error("Malloc failed");
+	init(sdl);
+	load_media(sdl, lem_in);
 	//print_file(lem_in->file);
 	print_lem_in(lem_in);
 	while (1)
@@ -617,22 +679,24 @@ int	main(int argc, char **argv)
 			}
 		}
 
-		SDL_SetRenderDrawColor(sdl->renderer, 0xFF, 0xFF, 0xFF, 0xFF);
+		SDL_SetRenderDrawColor(sdl->renderer, 0x77, 0x77, 0x77, 0xFF);
 		SDL_RenderClear(sdl->renderer);
+		t_texture *texture = sdl->textures;
 		for (t_room *room = lem_in->first; room; room = room->next)
 		{
-			SDL_Rect fillRect = {room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y, 10, 10};
+			SDL_Rect fillRect = {room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y, 20, 20};
 			SDL_SetRenderDrawColor(sdl->renderer, 0x99, 0x99, 0x99, 0xFF);        
 			SDL_RenderFillRect(sdl->renderer, &fillRect);
+			render_texture(sdl, texture, room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y - 20);
+			texture = texture->next;
 			SDL_SetRenderDrawBlendMode(sdl->renderer, SDL_BLENDMODE_BLEND);
 			SDL_SetRenderDrawColor(sdl->renderer, 0xCC, 0xCC, 0xCC, 0x99);
 			for (t_link *link = room->links; link; link = link->next)
 			{
-				ft_printf("link: %s-%s", room->name, link->room->name);
-				ft_printf("link: (%d.%d) (%d.%d))\n", room->x_scaled, room->y_scaled, link->room->x_scaled, link->room->y_scaled);
+				//ft_printf("link: %s-%s", room->name, link->room->name);
+				//ft_printf("link: (%d.%d) (%d.%d))\n", room->x_scaled, room->y_scaled, link->room->x_scaled, link->room->y_scaled);
 				SDL_RenderDrawLine(sdl->renderer, room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y, link->room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, link->room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y);
 			}
-			ft_printf("done\n");
 		}
 		SDL_RenderPresent(sdl->renderer);
 	}
