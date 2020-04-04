@@ -531,13 +531,39 @@ void	mergesort(t_room **room, int sorting_mode)
 
 void	normalize_distances(t_lem_in *lem_in)
 {
+	int i;
+
 	mergesort(&lem_in->first, SORT_ROOM_X);
 	for (t_room *print = lem_in->first; print; print = print->next)
 		ft_printf("SORTED_X: %s (%d.%d)\n", print->name, print->x, print->y);
-	//change room coordinates to be next to each other
+	i = 0;
+	for  (t_room *room = lem_in->first; room; room = room->next)
+	{
+		if (room->next && room->next->x != room->x)
+		{
+			room->x = i;
+			i++;
+		}
+		else
+			room->x = i;
+	}
+	for (t_room *print = lem_in->first; print; print = print->next)
+		ft_printf("SORTED_X: %s (%d.%d)\n", print->name, print->x, print->y);
+	i = 0;
 	mergesort(&lem_in->first, SORT_ROOM_Y);
 	for (t_room *print = lem_in->first; print; print = print->next)
 		ft_printf("SORTED_Y: %s (%d.%d)\n", print->name, print->x, print->y);
+	i = 0;
+	for  (t_room *room = lem_in->first; room; room = room->next)
+	{
+		if (room->next && room->next->y != room->y)
+		{
+			room->y = i;
+			i++;
+		}
+		else
+			room->y = i;
+	}
 	//change room coordinates to be next to each other
 }
 
@@ -554,8 +580,8 @@ int	main(int argc, char **argv)
 	init(sdl);
 	load_media(sdl);
 	lem_in->file = save_input(lem_in);
-	scale_rooms(lem_in);
 	normalize_distances(lem_in);
+	scale_rooms(lem_in);
 	//print_file(lem_in->file);
 	print_lem_in(lem_in);
 	while (1)
@@ -602,8 +628,11 @@ int	main(int argc, char **argv)
 			SDL_SetRenderDrawColor(sdl->renderer, 0xCC, 0xCC, 0xCC, 0x99);
 			for (t_link *link = room->links; link; link = link->next)
 			{
-				SDL_RenderDrawLine(sdl->renderer, room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y, room->links->room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->links->room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y);
+				ft_printf("link: %s-%s", room->name, link->room->name);
+				ft_printf("link: (%d.%d) (%d.%d))\n", room->x_scaled, room->y_scaled, link->room->x_scaled, link->room->y_scaled);
+				SDL_RenderDrawLine(sdl->renderer, room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y, link->room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, link->room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y);
 			}
+			ft_printf("done\n");
 		}
 		SDL_RenderPresent(sdl->renderer);
 	}
