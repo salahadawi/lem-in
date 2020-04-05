@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 18:53:51 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/04 19:05:16 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/05 17:50:21 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,9 @@ enum				e_sorting_mode
 typedef	struct			s_file
 {
 	char 				*line;
+	int					executed;
 	struct s_file		*next;
+	struct s_file		*prev;
 }						t_file;
 
 typedef	struct			s_room
@@ -54,6 +56,32 @@ typedef	struct			s_link
 	struct s_link		*next;
 }						t_link;
 
+typedef	struct			s_texture
+{
+	SDL_Texture			*texture;
+	int					width;
+	int					height;
+	struct s_texture	*next;
+}						t_texture;
+
+typedef struct			s_move
+{
+	int					x;
+	int					y;
+	struct s_move		*next;
+}						t_move;
+
+typedef	struct 			s_ant
+{
+	int					number;
+	t_room				*room;
+	int					current_x;
+	int					current_y;
+	struct s_ant		*next;
+	t_texture			*texture;
+	t_move				*moves;
+}						t_ant;
+
 typedef	struct			s_lem_in
 {
 	int					x_min;
@@ -66,16 +94,8 @@ typedef	struct			s_lem_in
 	t_room				*start;
 	t_room				*end;
 	int					ants_amount;
+	t_ant				*ants;
 }						t_lem_in;
-
-
-typedef	struct			s_texture
-{
-	SDL_Texture			*texture;
-	int					width;
-	int					height;
-	struct s_texture	*next;
-}						t_texture;
 
 typedef struct			s_mouse
 {

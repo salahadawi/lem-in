@@ -82,6 +82,7 @@ void	load_from_rendered_text(t_sdl *sdl, t_texture *texture, char *text, SDL_Col
 	texture->width = text_surface->w;
 	texture->height = text_surface->h;
 	SDL_FreeSurface(text_surface);
+	free(text);
 }
 
 void	texture_load_from_file(t_sdl *sdl, t_texture *texture, char *path)
@@ -92,18 +93,22 @@ void	texture_load_from_file(t_sdl *sdl, t_texture *texture, char *path)
 	free_texture(texture);
 	if (!(loaded_surface = IMG_Load(path)))
 		handle_error_sdl("Unable to load image!");
-	SDL_SetColorKey(loaded_surface, SDL_TRUE, SDL_MapRGB(loaded_surface->format, 0, 0xFF, 0xFF));
 	if (!(new_texture = SDL_CreateTextureFromSurface(sdl->renderer, loaded_surface)))
 		handle_error_sdl("Unable to create texture from surface!");
 	texture->texture = new_texture;
-	texture->width = loaded_surface->w;
-	texture->height = loaded_surface->h;
+	texture->width = 50;
+	texture->height = 50;
 	SDL_FreeSurface(loaded_surface);
 }
 
 void	render_texture(t_sdl *sdl, t_texture *texture, int x, int y)
 {
-	SDL_Rect render_quad = {x, y, texture->width, texture->height};
+	SDL_Rect render_quad;
+	//check if texture is ant, not text
+	if (texture->width == 50)
+		render_quad = (SDL_Rect){x, y, texture->width * sdl->mods->zoom, texture->height * sdl->mods->zoom};
+	else
+		render_quad = (SDL_Rect){x, y, texture->width, texture->height};
 	SDL_RenderCopy(sdl->renderer, texture->texture, NULL, &render_quad);
 }
 
@@ -140,10 +145,16 @@ void	load_media(t_sdl *sdl, t_lem_in *lem_in)
 		if (texture->next)
 			texture = texture->next;
 		if (room == lem_in->start)
-			room->name = ft_strjoinfree(room->name, ft_strdup(" ##start"));
-		if (room == lem_in->end)
-			room->name = ft_strjoinfree(room->name, ft_strdup(" ##end"));
-		load_from_rendered_text(sdl, texture, room->name, text_color);
+			load_from_rendered_text(sdl, texture, ft_strjoin(room->name, " ##start"), text_color);
+		else if (room == lem_in->end)
+			load_from_rendered_text(sdl, texture, ft_strjoin(room->name, " ##end"), text_color);
+		else
+			load_from_rendered_text(sdl, texture, ft_strdup(room->name), text_color);
+	}
+	for (t_ant *ant = lem_in->ants; ant; ant = ant->next)
+	{
+		ant->texture = new_texture();
+		texture_load_from_file(sdl, ant->texture, "ant.png");
 	}
 }
 
@@ -187,14 +198,16 @@ void	close_sdl(t_sdl *sdl)
 	exit(0);
 }
 
-t_file	*file_new(char *line)
+t_file	*file_new(char *line, t_file *prev)
 {
 	t_file *file;
 
 	if (!(file = (t_file*)ft_memalloc(sizeof(t_file))))
 		handle_error("Malloc failed.");
 	file->line = line;
+	file->executed = 0;
 	file->next = NULL;
+	file->prev = prev;
 	return (file);
 }
 
@@ -484,7 +497,7 @@ char	*save_rooms(t_lem_in *lem_in)
 	return (line);
 }
 
-void	save_links(t_lem_in *lem_in, char *line)
+char	*save_links(t_lem_in *lem_in, char *line)
 {
 
 	if (check_line_link(line))
@@ -492,7 +505,7 @@ void	save_links(t_lem_in *lem_in, char *line)
 	while (get_next_line(0, &line) > 0)
 	{
 		if (line[0] == 'L')
-			break;
+			return line;
 		if (!check_line_comment(line))
 		{
 			if (check_line_link(line))
@@ -501,21 +514,33 @@ void	save_links(t_lem_in *lem_in, char *line)
 		//file->next = file_new(line);
 		//file = file->next;
 	}
+	return (line);
 }
 
-t_file	*save_input(t_lem_in *lem_in)
+void	save_movements(t_lem_in *lem_in, char *line)
+{
+	t_file *file;
+
+// adds an extra empty file node to beginning to store first ant backwards move, seems to work pretty well?
+	file = file_new(ft_strdup(" "), NULL);
+	file->next = file_new(line, file);
+	file = file->next;
+	lem_in->file = file;
+	while (get_next_line(0, &line) > 0)
+	{
+		file->next = file_new(line, file);
+		file = file->next;
+	}
+}
+
+void	save_input(t_lem_in *lem_in)
 {
 	char *line;
-	//t_file *file; //file probably doesn't need to be saved
-	//t_file *first;
-
 
 	save_ants_amount(lem_in);
 	line = save_rooms(lem_in);
-	save_links(lem_in, line);
-	//file = file_new(line);
-	//first = file;
-	return (NULL);
+	line = save_links(lem_in, line);
+	save_movements(lem_in, line);
 }
 
 void	print_file(t_file *file)
@@ -718,6 +743,264 @@ void	normalize_distances(t_lem_in *lem_in)
 	//change room coordinates to be next to each other
 }
 
+t_ant	*new_ant(t_lem_in *lem_in, int i)
+{
+	t_ant	*ant;
+
+	if (!(ant = (t_ant*)ft_memalloc(sizeof(t_ant))))
+		handle_error("Malloc failed.");
+	ant->number = i;
+	ant->room = lem_in->start;
+	ant->next = NULL;
+	ant->texture = NULL;
+	ant->current_x = ant->room->x_scaled;
+	ant->current_y = ant->room->y_scaled;
+	ant->moves = NULL;
+	return (ant);
+}
+
+void	create_ants(t_lem_in *lem_in)
+{
+	t_ant *ant;
+
+	ant = NULL;
+	for (int i = 1; i <= lem_in->ants_amount; i++)
+	{
+		if (!ant)
+		{
+			ant = new_ant(lem_in, i);
+			lem_in->ants = ant;
+		}
+		else
+		{
+			ant->next = new_ant(lem_in, i);
+			ant = ant->next;
+		}
+	}
+}
+
+t_move	*new_move(void)
+{
+	t_move *move;
+
+	move = (t_move*)malloc(sizeof(t_move));
+	move->x = 0;
+	move->y = 0;
+	move->next = NULL;
+	return (move);
+}
+
+t_move	*save_move(int x, int y)
+{
+	t_move *move;
+
+	move = new_move();
+	move->x = x;
+	move->y = y;
+	return (move);
+}
+
+void	plot_line_low(t_ant *ant, int x1, int y1, int x2, int y2)
+{
+	int *dxy;
+	int *xy;
+	int yi;
+	int d;
+	t_move *move;
+
+	move = NULL;
+	dxy = (int[2]){x2 - x1, y2 - y1};
+	yi = 1;
+	if (dxy[1] < 0)
+	{
+		yi = -1;
+		dxy[1] *= -1;
+	}
+	d = 2 * dxy[1] - dxy[0];
+	xy = (int[2]){x1, y1};
+	while (xy[0] <= x2)
+	{
+		if (!move)
+		{
+			move = save_move(xy[0], xy[1]);
+			ant->moves = move;
+		}
+		else
+		{
+			move->next = save_move(xy[0], xy[1]);
+			move = move->next;
+		}
+		if (d > 0)
+		{
+			xy[1] += yi;
+			d -= 2 * dxy[0];
+		}
+		xy[0]++;
+		d += 2 * dxy[1];
+	}
+}
+
+void	plot_line_high(t_ant *ant, int x1, int y1, int x2, int y2)
+{
+	int *dxy;
+	int *xy;
+	int xi;
+	int d;
+	t_move *move;
+
+	move = NULL;
+
+	dxy = (int[2]){x2 - x1, y2 - y1};
+	xi = 1;
+	if (dxy[0] < 0)
+	{
+		xi = -1;
+		dxy[0] *= -1;
+	}
+	d = 2 * dxy[0] - dxy[1];
+	xy = (int[2]){x1, y1};
+	if (xy[1] <= y2)
+	{
+		if (!move)
+		{
+			move = save_move(xy[0], xy[1]);
+			ant->moves = move;
+		}
+		else
+		{
+			move->next = save_move(xy[0], xy[1]);
+			move = move->next;
+		}
+		if (d > 0)
+		{
+			xy[0] += xi;
+			d -= 2 * dxy[1];
+		}
+		xy[1]++;
+		d += 2 * dxy[0];
+	}
+}
+
+void	reverse_moves(t_move **moves)
+{
+	t_move *prev;
+	t_move *current;
+	t_move *next;
+
+	prev = NULL;
+	current = (*moves);
+	next = NULL;
+	while (current)
+	{
+		next = current->next;
+		current->next = prev;
+		prev = current;
+		current = next;
+	}
+	*moves = prev;
+}
+
+void	plot_line(t_ant *ant, int x1, int y1, int x2, int y2)
+{
+	if (abs(y2 - y1) < abs(x2 - x1))
+	{
+		if (x1 > x2)
+		{
+			plot_line_low(ant, x2, y2, x1, y1);
+			reverse_moves(&ant->moves);
+		}
+		plot_line_low(ant, x1, y1, x2, y2);
+	}
+	else
+	{
+		if (y1 > y2)
+		{
+			plot_line_high(ant, x2, y2, x1, y1);
+			reverse_moves(&ant->moves);
+		}
+		plot_line_high(ant, x1, y1, x2, y2);
+	}
+}
+
+void	animate_ant_movement(t_lem_in *lem_in, t_file *file)
+{
+	char **move_arr;
+	t_ant *ant;
+
+	if (file->executed)
+		return ;
+	move_arr = ft_strsplit(file->line, ' ');
+	file->executed = 1;
+	ant =  NULL;
+	//for (int i = 0; move_arr[i]; i++)
+	//{
+		//ft_printf("%s\n", move_arr[i]);
+	//}
+	for (int i = 0; move_arr[i]; i++)
+	{
+		for (t_ant *tmp_ant = lem_in->ants; tmp_ant; tmp_ant = tmp_ant->next)
+		{
+			//ft_printf("ANT NUMBER %d ANT_NUM %d\n", tmp_ant->number, ft_atoi(&move_arr[i][1]));
+			if (tmp_ant->number == ft_atoi(&move_arr[i][1]))
+			{
+				ant = tmp_ant;
+				//ft_printf("CCCC\n");
+				break;
+			}
+		}
+		//ft_printf("TESTTEST\n");
+		if (!ant)
+		{
+			ft_printf("TESTAAAA\n");
+			break;
+		}
+		//ft_printf("%sTESTBBBB\n", ant->room->links->next->room->name);
+		for (t_link *room_link = ant->room->links; room_link; room_link = room_link->next)
+		{
+			ft_printf("Room: %s, link: %s\n", room_link->room->name, ft_strchr(move_arr[i], '-') + 1);
+			if (ft_strequ(room_link->room->name, ft_strchr(move_arr[i], '-') + 1))
+			{
+				if (ant->room == lem_in->start)
+				{
+					if (file->prev)
+						file->prev->line = ft_strjoinfree(file->prev->line, ft_sprintf(" L%d-%s", ant->number, lem_in->start->name));
+				}
+				ant->current_x = ant->room->x_scaled;
+				ant->current_y = ant->room->y_scaled;
+				ant->room = room_link->room;
+				plot_line(ant, ant->current_x, ant->current_y, ant->room->x_scaled, ant->room->y_scaled);
+				break;
+			}
+		}
+	}
+}
+
+void	move_ant(t_ant *ant)
+{
+	if (!ant->moves)
+		return ;
+	ant->current_x = ant->moves->x;
+	ant->current_y = ant->moves->y;
+	if (ant->moves->next && ant->moves->next->next)
+	{
+		if (ant->moves->next->next->next)
+			ant->moves = ant->moves->next->next->next;
+		else
+			ant->moves = ant->moves->next->next;
+	} //change for speed
+	else
+		ant->moves = ant->moves->next;
+	//need algorith for line movement
+	/*if (ant->current_x > ant->room->x_scaled)
+		ant->current_x -= 1;
+	else if (ant->current_x < ant->room->x_scaled)
+		ant->current_x += 1;
+	if (ant->current_y > ant->room->y_scaled)
+		ant->current_y -= 1;
+	else if (ant->current_y < ant->room->y_scaled)
+		ant->current_y += 1;*/
+}
+
 int	main(int argc, char **argv)
 {
 	t_sdl	*sdl;
@@ -726,14 +1009,15 @@ int	main(int argc, char **argv)
 	(void)argc;
 	(void)argv;
 	lem_in = init_lem_in();
-	lem_in->file = save_input(lem_in);
+	save_input(lem_in);
 	normalize_distances(lem_in);
 	scale_rooms(lem_in);
+	create_ants(lem_in);
 	if (!(sdl = (t_sdl*)ft_memalloc(sizeof(t_sdl))))
 		handle_error("Malloc failed");
 	init(sdl);
 	load_media(sdl, lem_in);
-	//print_file(lem_in->file);
+	print_file(lem_in->file);
 	print_lem_in(lem_in);
 	while (1)
 	{
@@ -747,6 +1031,26 @@ int	main(int argc, char **argv)
 					sdl->mods->zoom += 0.05;
 				else if (sdl->e.wheel.y < 0)
 					sdl->mods->zoom -= 0.05;
+			}
+			else if (sdl->e.type == SDL_KEYDOWN)
+			{
+				switch(sdl->e.key.keysym.sym)
+                {
+                	case SDLK_RIGHT:
+					if (lem_in->file->next)
+					{
+						lem_in->file->executed = 0;
+						lem_in->file = lem_in->file->next;
+					}
+					break;
+					case SDLK_LEFT:
+					if (lem_in->file->prev)
+					{
+						lem_in->file->executed = 0;
+						lem_in->file = lem_in->file->prev;
+					}
+					break;
+				}
 			}
 			if (sdl->e.type == SDL_MOUSEBUTTONDOWN)
 					sdl->mouse->mouse1 = 1;
@@ -767,6 +1071,7 @@ int	main(int argc, char **argv)
 				sdl->mouse->y = y;
 			}
 		}
+		animate_ant_movement(lem_in, lem_in->file);
 		SDL_SetRenderDrawColor(sdl->renderer, 0x77, 0x77, 0x77, 0xFF);
 		SDL_RenderClear(sdl->renderer);
 		t_texture *texture = sdl->textures;
@@ -788,6 +1093,12 @@ int	main(int argc, char **argv)
 			SDL_RenderFillRect(sdl->renderer, &fillRect);
 			render_texture(sdl, texture, room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y - 20);
 			texture = texture->next;
+		}
+		for (t_ant *ant = lem_in->ants; ant; ant = ant->next)
+		{
+			move_ant(ant);
+			if (!(ant->current_x == lem_in->end->x_scaled))
+				render_texture(sdl, ant->texture, ant->current_x * sdl->mods->zoom + sdl->mods->offset_x, ant->current_y * sdl->mods->zoom + sdl->mods->offset_y);
 		}
 		SDL_RenderPresent(sdl->renderer);
 	}
