@@ -523,9 +523,9 @@ void	save_movements(t_lem_in *lem_in, char *line)
 
 // adds an extra empty file node to beginning to store first ant backwards move, seems to work pretty well?
 	file = file_new(ft_strdup(" "), NULL);
+	lem_in->file = file;
 	file->next = file_new(line, file);
 	file = file->next;
-	lem_in->file = file;
 	while (get_next_line(0, &line) > 0)
 	{
 		file->next = file_new(line, file);
@@ -589,7 +589,8 @@ t_lem_in	*init_lem_in(void)
 int		scale(int n, int old[2], int new[2])
 {
 	int result;
-
+	if (!(old[1] - old[0]))
+		old[1]++;
 	result = (new[1] - new[0]) * (n - old[0]) / (old[1] - old[0]) + new[0];
 	return (result);
 }
@@ -859,7 +860,7 @@ void	plot_line_high(t_ant *ant, int x1, int y1, int x2, int y2)
 	}
 	d = 2 * dxy[0] - dxy[1];
 	xy = (int[2]){x1, y1};
-	if (xy[1] <= y2)
+	while (xy[1] <= y2)
 	{
 		if (!move)
 		{
@@ -1030,7 +1031,8 @@ int	main(int argc, char **argv)
 				if (sdl->e.wheel.y > 0)
 					sdl->mods->zoom += 0.05;
 				else if (sdl->e.wheel.y < 0)
-					sdl->mods->zoom -= 0.05;
+					if (sdl->mods->zoom > 0.05)
+						sdl->mods->zoom -= 0.05;
 			}
 			else if (sdl->e.type == SDL_KEYDOWN)
 			{
