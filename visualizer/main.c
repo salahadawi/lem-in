@@ -1097,7 +1097,7 @@ int	main(int argc, char **argv)
 		for (t_ant *ant = lem_in->ants; ant; ant = ant->next)
 		{
 			move_ant(ant);
-			if (!(ant->current_x == lem_in->end->x_scaled))
+			if (!(ant->current_x == lem_in->end->x_scaled && ant->current_y == lem_in->end->y_scaled))
 				render_texture(sdl, ant->texture, ant->current_x * sdl->mods->zoom + sdl->mods->offset_x, ant->current_y * sdl->mods->zoom + sdl->mods->offset_y);
 		}
 		SDL_RenderPresent(sdl->renderer);
