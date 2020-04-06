@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 22:54:44 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/06 17:56:01 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/06 22:44:50 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,7 @@ void	find_weights(t_farm **farm)
 	
 	queue = NULL;
 	visited = NULL;
+	enqueue(&visited, (*farm)->start);
 	(*farm)->end->weight = 0;
 	enqueue(&queue, (*farm)->end);
 	weight = 1;
@@ -86,7 +87,7 @@ void	find_weights(t_farm **farm)
 			if (!room_in_links(neighbor, visited))
 			{
 				enqueue(&queue, neighbor);
-				ft_printf("#Added to queue: %s\n", neighbor->name); //
+				ft_printf("#Added to qu eue: %s\n", neighbor->name); //
 			}
 			if (neighbor->weight > cur->room->weight + 1)
 			{
@@ -155,11 +156,22 @@ void	create_ants(t_farm *farm, t_ant **first)
 	ants->next = NULL;
 }
 
-void	remove_ant(t_ant **ants)
+void	remove_ant(t_ant **first, t_ant **ants)
 {
 	t_ant *tmp;
+	t_ant *first_tmp;
 
 	tmp = (*ants)->next;
+	if (*first == (*ants)->next)
+	{
+		free(*ants);
+		*ants = tmp;
+		return ;
+	}
+	first_tmp = (*first);
+	while (first_tmp->next != *ants)
+		first_tmp = first_tmp->next;
+	first_tmp->next = tmp;
 	free(*ants);
 	*ants = tmp;
 }
@@ -187,7 +199,9 @@ int		optimal_room1(t_link *links, t_ant **ant, t_farm *farm)
 int		optimal_room(t_link *links, t_ant **ant, t_farm *farm)
 {
 	t_room *optimal_room;
+	t_link *tmp_link;
 
+	tmp_link = links;
 	optimal_room = (*ant)->room;
 	while (links)
 	{
@@ -196,13 +210,22 @@ int		optimal_room(t_link *links, t_ant **ant, t_farm *farm)
 		links = links->next;
 	}
 	if ((*ant)->room == optimal_room)
+	{
+		while (tmp_link)
+		{
+			if (!tmp_link->room->occupied)
+				if (tmp_link->room->weight <= optimal_room->weight + farm->ants_amount)
+					optimal_room = tmp_link->room;	
+			tmp_link = tmp_link->next;
+		}
+	}
+	if ((*ant)->room == optimal_room)
 		return (0);
 	if ((*ant)->room != farm->start)
 		(*ant)->room->occupied = 0;
 	(*ant)->room = optimal_room;
 	if ((*ant)->room != farm->end)
 		(*ant)->room->occupied = 1;
-	ft_printf("L%d-%s ", (*ant)->number, (*ant)->room->name);
 	return (1);
 }
 
@@ -223,8 +246,8 @@ void	move_ants(t_farm **farm)
 			{
 				if (ants == first)
 					first = ants->next;
-				remove_ant(&ants);
-				//(*farm)->ants_amount--;
+				remove_ant(&first, &ants);
+				(*farm)->ants_amount--;
 			}
 			else
 				ants = ants->next;
@@ -239,6 +262,47 @@ void	print_visualizer_info(t_farm *farm)
 	ft_printf("%s %s\n", farm->start->name, farm->end->name);
 }
 
+void	make_links_oneway(t_farm **farm)
+{
+	t_link *queue;
+	t_room *neighbor;
+	int		weight;
+	t_link *visited;
+	t_link *links;
+	t_link *cur;
+	
+	queue = NULL;
+	visited = NULL;
+	(*farm)->end->weight = 0;
+	enqueue(&queue, (*farm)->end);
+	weight = 1;
+	while (queue)
+	{
+		cur = queue;
+		while (cur->next)
+			cur = cur->next;
+		ft_printf("#Examining %s neighbors\n", cur->room->name); //
+		links = cur->room->links;
+		while (links)
+		{
+			neighbor = links->room;
+			if (!room_in_links(neighbor, visited))
+			{
+				enqueue(&queue, neighbor);
+				ft_printf("#Added to queue: %s\n", neighbor->name); //
+			}
+			if (neighbor->weight > cur->room->weight + 1)
+			{
+				ft_printf("#Change %s weight to %d\n", neighbor->name, cur->room->weight+1); //
+				neighbor->weight = cur->room->weight + 1;
+			}
+			links = links->next;
+		}
+		enqueue(&visited, dequeue(&queue));
+		weight++;
+	}
+}
+
 int	main(int argc, char **argv)
 {
 	t_farm *farm;
@@ -251,6 +315,7 @@ int	main(int argc, char **argv)
 	//if (ft_strchr(g_flags, 'v'))
 		//print_visualizer_info(farm);
 	//print_farm(farm);
+	//make_links_oneway(&farm);
 	print_file(farm->file_start); //remember to print newline before ant movements
 	farm->start->occupied = 1;
 	move_ants(&farm); //
