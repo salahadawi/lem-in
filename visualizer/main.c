@@ -38,6 +38,7 @@ void	init_mods(t_mods **mods)
 	(*mods)->zoom = 1;
 	(*mods)->offset_x = SCREEN_WIDTH / 2;
 	(*mods)->offset_y = SCREEN_HEIGHT / 2;
+	(*mods)->speed = 8;
 }
 
 void	init(t_sdl *sdl)
@@ -976,21 +977,20 @@ void	animate_ant_movement(t_lem_in *lem_in, t_file *file)
 	}
 }
 
-void	move_ant(t_ant *ant)
+void	move_ant(t_sdl *sdl, t_ant *ant)
 {
 	if (!ant->moves)
 		return ;
 	ant->current_x = ant->moves->x;
 	ant->current_y = ant->moves->y;
-	if (ant->moves->next && ant->moves->next->next)
+	ant->moves = ant->moves->next;
+	for (int i = 0; i < sdl->mods->speed; i++)
 	{
-		if (ant->moves->next->next->next)
-			ant->moves = ant->moves->next->next->next;
-		else
-			ant->moves = ant->moves->next->next;
-	} //change for speed
-	else
-		ant->moves = ant->moves->next;
+		if (!ant->moves)
+			break;
+		if (ant->moves->next)
+			ant->moves = ant->moves->next;
+	}
 	//need algorith for line movement
 	/*if (ant->current_x > ant->room->x_scaled)
 		ant->current_x -= 1;
@@ -1052,6 +1052,14 @@ int	main(int argc, char **argv)
 						lem_in->file = lem_in->file->prev;
 					}
 					break;
+					case SDLK_UP:
+					if (sdl->mods->speed < 20)
+						sdl->mods->speed++;
+					break;
+					case SDLK_DOWN:
+					if (sdl->mods->speed > 0)
+						sdl->mods->speed--;
+					break;
 				}
 			}
 			if (sdl->e.type == SDL_MOUSEBUTTONDOWN)
@@ -1098,7 +1106,7 @@ int	main(int argc, char **argv)
 		}
 		for (t_ant *ant = lem_in->ants; ant; ant = ant->next)
 		{
-			move_ant(ant);
+			move_ant(sdl, ant);
 			if (!(ant->current_x == lem_in->end->x_scaled && ant->current_y == lem_in->end->y_scaled))
 				render_texture(sdl, ant->texture, ant->current_x * sdl->mods->zoom + sdl->mods->offset_x, ant->current_y * sdl->mods->zoom + sdl->mods->offset_y);
 		}

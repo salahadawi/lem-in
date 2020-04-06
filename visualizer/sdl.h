@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 18:53:51 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/05 17:50:21 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/06 13:30:17 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -110,6 +110,7 @@ typedef struct			s_mods
 	double				zoom;
 	int					offset_x;
 	int					offset_y;
+	int					speed;
 }						t_mods;
 
 typedef struct			s_sdl
