@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/29 13:01:18 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/29 17:27:00 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/04 19:07:46 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,6 +38,8 @@ int		save_line_room(t_farm **farm, t_room **room, char *line)
 	return (1);
 }
 
+
+//can probably change return value to void?
 int		save_command_room(t_farm **farm, t_room **room, char **line, int cmd)
 {
 	save_line_file(farm, *line);

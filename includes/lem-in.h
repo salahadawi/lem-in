@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/30 19:03:03 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/06 16:29:51 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,16 +43,6 @@ typedef	struct		s_link
 	struct s_link	*next;
 }					t_link;
 
-typedef	struct		s_farm
-{
-	t_file			*file_start;
-	t_file			*file_end;
-	int				ants_amount;
-	t_room			*start;
-	t_room			*end;
-	t_room			*first;
-}					t_farm;
-
 // maybe somekind of ant struct?
 typedef	struct 		s_ant
 {
@@ -61,6 +51,17 @@ typedef	struct 		s_ant
 	struct s_ant	*next;
 	//int			moved ?? if moved this turn // this is probably unneeded because order is enough
 }					t_ant;
+
+typedef	struct		s_farm
+{
+	t_file			*file_start;
+	t_file			*file_end;
+	int				ants_amount;
+	t_room			*start;
+	t_room			*end;
+	t_room			*first;
+	int				(*alg)(t_link*, t_ant**, struct s_farm*);
+}					t_farm;
 
 int		handle_error(char *message);
 
@@ -125,5 +126,9 @@ void	print_file(t_file *file);
 void	free_file(t_file **file);
 
 void	free_farm(t_farm **farm);
+
+int		optimal_room(t_link *links, t_ant **ant, t_farm *farm);
+
+int		optimal_room1(t_link *links, t_ant **ant, t_farm *farm);
 
 #endif

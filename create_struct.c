@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 20:58:02 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/29 16:24:46 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/06 16:29:39 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,4 +54,8 @@ void	init_farm(t_farm **farm)
 	(*farm)->start = NULL;
 	(*farm)->end = NULL;
 	(*farm)->first = NULL;
+	if (ft_strchr(g_flags, '1'))
+		(*farm)->alg = optimal_room1;
+	else
+	(*farm)->alg = optimal_room;
 }

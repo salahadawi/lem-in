@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 22:54:44 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/04 13:53:36 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/06 17:56:01 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,7 +78,7 @@ void	find_weights(t_farm **farm)
 		cur = queue;
 		while (cur->next)
 			cur = cur->next;
-		ft_printf("Examining %s neighbors\n", cur->room->name); //
+		ft_printf("#Examining %s neighbors\n", cur->room->name); //
 		links = cur->room->links;
 		while (links)
 		{
@@ -86,11 +86,11 @@ void	find_weights(t_farm **farm)
 			if (!room_in_links(neighbor, visited))
 			{
 				enqueue(&queue, neighbor);
-				ft_printf("Added to queue: %s\n", neighbor->name); //
+				ft_printf("#Added to queue: %s\n", neighbor->name); //
 			}
 			if (neighbor->weight > cur->room->weight + 1)
 			{
-				ft_printf("Change %s weight to %d\n", neighbor->name, cur->room->weight+1); //
+				ft_printf("#Change %s weight to %d\n", neighbor->name, cur->room->weight+1); //
 				neighbor->weight = cur->room->weight + 1;
 			}
 			links = links->next;
@@ -140,12 +140,14 @@ t_ant	*new_ant(t_farm *farm, int *ant_number)
 void	create_ants(t_farm *farm, t_ant **first)
 {
 	int		ant_number;
+	int		ants_amount;
 	t_ant	*ants;
 	
 	ant_number = 1;
 	ants = new_ant(farm, &ant_number);
 	(*first) = ants;
-	while (--farm->ants_amount)
+	ants_amount = farm->ants_amount;
+	while (--ants_amount)
 	{
 		ants->next = new_ant(farm, &ant_number);
 		ants = ants->next;
@@ -162,7 +164,7 @@ void	remove_ant(t_ant **ants)
 	*ants = tmp;
 }
 
-int		optimal_room(t_link *links, t_ant **ant, t_farm *farm)
+int		optimal_room1(t_link *links, t_ant **ant, t_farm *farm)
 {
 	t_room *optimal_room;
 
@@ -182,6 +184,28 @@ int		optimal_room(t_link *links, t_ant **ant, t_farm *farm)
 	return (1);
 }
 
+int		optimal_room(t_link *links, t_ant **ant, t_farm *farm)
+{
+	t_room *optimal_room;
+
+	optimal_room = (*ant)->room;
+	while (links)
+	{
+		if (links->room->weight <= optimal_room->weight && !links->room->occupied)
+			optimal_room = links->room;	
+		links = links->next;
+	}
+	if ((*ant)->room == optimal_room)
+		return (0);
+	if ((*ant)->room != farm->start)
+		(*ant)->room->occupied = 0;
+	(*ant)->room = optimal_room;
+	if ((*ant)->room != farm->end)
+		(*ant)->room->occupied = 1;
+	ft_printf("L%d-%s ", (*ant)->number, (*ant)->room->name);
+	return (1);
+}
+
 void	move_ants(t_farm **farm)
 {
 	t_ant *ants;
@@ -193,19 +217,26 @@ void	move_ants(t_farm **farm)
 		ants = first;
 		while (ants)
 		{
-			if (optimal_room(ants->room->links, &ants, *farm))
+			if ((*farm)->alg(ants->room->links, &ants, *farm))
 				ft_printf("L%d-%s ", ants->number, ants->room->name); //maybe somekind of sprintf implementation, currently might print extra spaces
 			if (ants->room == (*farm)->end)
 			{
 				if (ants == first)
 					first = ants->next;
 				remove_ant(&ants);
+				//(*farm)->ants_amount--;
 			}
 			else
 				ants = ants->next;
 		}
 		ft_printf("\n");
 	}
+}
+
+void	print_visualizer_info(t_farm *farm)
+{
+	ft_printf("#%d ", farm->ants_amount);
+	ft_printf("%s %s\n", farm->start->name, farm->end->name);
 }
 
 int	main(int argc, char **argv)
@@ -216,8 +247,12 @@ int	main(int argc, char **argv)
 	farm = save_input();
 	find_weights(&farm); //calculate and add weights to each room
 	check_links_valid(&farm);
+	// not needed right now, maybe for drawing line weights
+	//if (ft_strchr(g_flags, 'v'))
+		//print_visualizer_info(farm);
 	//print_farm(farm);
 	print_file(farm->file_start); //remember to print newline before ant movements
+	farm->start->occupied = 1;
 	move_ants(&farm); //
 	free_farm(&farm);
 	free(g_flags);
