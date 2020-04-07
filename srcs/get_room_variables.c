@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 23:16:06 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 19:09:33 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:20:26 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/lem-in.h"
+#include "lem-in.h"
 
 int		get_line_room(t_room **room, char *line)
 {

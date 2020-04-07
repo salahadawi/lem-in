@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/07 18:56:21 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 19:07:40 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:20:12 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/lem-in.h"
+#include "lem-in.h"
 
 void	move_ants(t_farm **farm)
 {

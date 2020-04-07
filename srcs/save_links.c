@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/29 13:00:17 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 19:06:56 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:20:00 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/lem-in.h"
+#include "lem-in.h"
 
 void	get_line_link(char *line, char **link1, char **link2)
 {

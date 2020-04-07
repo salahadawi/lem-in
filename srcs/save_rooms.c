@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/29 13:01:18 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 19:06:23 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:19:51 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/lem-in.h"
+#include "lem-in.h"
 
 int		save_line_room(t_farm **farm, t_room **room, char *line)
 {

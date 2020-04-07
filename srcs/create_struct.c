@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 20:58:02 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 19:10:21 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:20:36 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/lem-in.h"
+#include "lem-in.h"
 
 t_file	*file_new(char *line)
 {
