@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 23:06:18 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/25 23:06:52 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 12:53:37 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,7 @@ void	save_ants_amount(t_farm **farm)
 	}
 	check_ants_amount(line);
 	(*farm)->ants_amount = ft_atoi(line);
+	(*farm)->start_ants_amount = (*farm)->ants_amount;
 	save_line_file(farm, line);
 }
 

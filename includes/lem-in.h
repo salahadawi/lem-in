@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/06 16:29:51 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 12:53:00 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,6 +57,7 @@ typedef	struct		s_farm
 	t_file			*file_start;
 	t_file			*file_end;
 	int				ants_amount;
+	int				start_ants_amount;
 	t_room			*start;
 	t_room			*end;
 	t_room			*first;

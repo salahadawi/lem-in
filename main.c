@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 22:54:44 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/06 22:44:50 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 18:19:55 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void	find_weights(t_farm **farm)
 			if (!room_in_links(neighbor, visited))
 			{
 				enqueue(&queue, neighbor);
-				ft_printf("#Added to qu eue: %s\n", neighbor->name); //
+				ft_printf("#Added to queue: %s\n", neighbor->name); //
 			}
 			if (neighbor->weight > cur->room->weight + 1)
 			{
@@ -196,9 +196,37 @@ int		optimal_room1(t_link *links, t_ant **ant, t_farm *farm)
 	return (1);
 }
 
+int		count_ants_in_line(t_ant *ant, t_farm *farm)
+{
+	int ants_in_line;
+	t_room	*current_room;
+	t_room	*next_room;
+
+	current_room = ant->room;
+	ants_in_line = 0;
+	while (current_room != farm->start)
+	{
+		next_room = current_room->links->room;
+		current_room->links = current_room->links->next;
+		while (current_room->links)
+		{
+			if (current_room->links->room->weight > next_room->weight)
+				next_room = current_room->links->room;
+		}
+		if (next_room->occupied && next_room != farm->start)
+			ants_in_line++;
+		current_room = next_room;
+		ft_printf("%d ", ants_in_line);
+		ft_printf("\n");
+	}
+	return (ants_in_line);
+}
+
 int		optimal_room(t_link *links, t_ant **ant, t_farm *farm)
 {
 	t_room *optimal_room;
+	int		ants_in_line;
+	(void)ants_in_line;
 	t_link *tmp_link;
 
 	tmp_link = links;
@@ -211,10 +239,12 @@ int		optimal_room(t_link *links, t_ant **ant, t_farm *farm)
 	}
 	if ((*ant)->room == optimal_room)
 	{
+		//ants_in_line = count_ants_in_line(*ant, farm);
+		//ft_printf("ants_in line: %d\n", ants_in_line);
 		while (tmp_link)
 		{
 			if (!tmp_link->room->occupied)
-				if (tmp_link->room->weight <= optimal_room->weight + farm->ants_amount)
+				if (tmp_link->room->weight <= optimal_room->weight + farm->start_ants_amount - (*ant)->room->weight)
 					optimal_room = tmp_link->room;	
 			tmp_link = tmp_link->next;
 		}
@@ -223,6 +253,8 @@ int		optimal_room(t_link *links, t_ant **ant, t_farm *farm)
 		return (0);
 	if ((*ant)->room != farm->start)
 		(*ant)->room->occupied = 0;
+	if ((*ant)->room == farm->start)
+		farm->start_ants_amount--;
 	(*ant)->room = optimal_room;
 	if ((*ant)->room != farm->end)
 		(*ant)->room->occupied = 1;
@@ -247,7 +279,6 @@ void	move_ants(t_farm **farm)
 				if (ants == first)
 					first = ants->next;
 				remove_ant(&first, &ants);
-				(*farm)->ants_amount--;
 			}
 			else
 				ants = ants->next;
