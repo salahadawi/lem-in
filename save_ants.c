@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 23:06:18 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 12:53:37 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 18:59:58 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,4 +42,22 @@ void	check_ants_amount(char *line)
 			handle_error("Ants amount is not a positive integer.");
 	if (ft_atoilong(line) > 2147483647)
 		handle_error("The amount of ants exceeds INT_MAX.");
+}
+
+void	create_ants(t_farm *farm, t_ant **first)
+{
+	int		ant_number;
+	int		ants_amount;
+	t_ant	*ants;
+
+	ant_number = 1;
+	ants = new_ant(farm, &ant_number);
+	(*first) = ants;
+	ants_amount = farm->ants_amount;
+	while (--ants_amount)
+	{
+		ants->next = new_ant(farm, &ant_number);
+		ants = ants->next;
+	}
+	ants->next = NULL;
 }

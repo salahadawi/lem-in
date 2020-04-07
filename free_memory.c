@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 22:54:16 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/25 23:03:59 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 19:09:49 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,7 +37,7 @@ void	free_farm(t_farm **farm)
 		while ((*farm)->first->links)
 		{
 			tmp_link = (*farm)->first->links->next;
-			free ((*farm)->first->links);
+			free((*farm)->first->links);
 			(*farm)->first->links = tmp_link;
 		}
 		free((*farm)->first->name);
@@ -51,4 +51,24 @@ void	free_links(char *link1, char *link2)
 {
 	free(link1);
 	free(link2);
+}
+
+void	remove_ant(t_ant **first, t_ant **ants)
+{
+	t_ant *tmp;
+	t_ant *first_tmp;
+
+	tmp = (*ants)->next;
+	if (*first == (*ants)->next)
+	{
+		free(*ants);
+		*ants = tmp;
+		return ;
+	}
+	first_tmp = (*first);
+	while (first_tmp->next != *ants)
+		first_tmp = first_tmp->next;
+	first_tmp->next = tmp;
+	free(*ants);
+	*ants = tmp;
 }

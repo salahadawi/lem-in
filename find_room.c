@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 23:08:25 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/29 18:09:05 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 19:10:04 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,7 +23,7 @@ int		find_first_room_by_names(t_room **room, char *name1, char *name2)
 	if (ft_strequ((*room)->name, name1))
 		return (1);
 	else
-		return (2);	
+		return (2);
 }
 
 void	find_room_by_name(t_room **room, char *name)

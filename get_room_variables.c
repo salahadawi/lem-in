@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 23:16:06 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/29 20:59:36 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 19:09:33 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,7 +31,7 @@ int		get_room_name(t_room **room, char *line, int *i)
 {
 	while (line[*i] != ' ' && line[*i])
 		(*i)++;
-	if (line[(*i)++] != ' ') // change to if (!line[i]) ??
+	if (line[(*i)++] != ' ')
 		return (0);
 	(*room)->name = ft_strsub(line, 0, *i - 1);
 	return (1);
