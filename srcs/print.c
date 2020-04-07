@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 21:00:27 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 20:20:04 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:45:59 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem-in.h"
+#include "lem_in.h"
 
 void	print_farm(t_farm *farm)
 {

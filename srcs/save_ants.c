@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 23:06:18 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 20:21:21 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:45:55 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem-in.h"
+#include "lem_in.h"
 
 void	save_ants_amount(t_farm **farm)
 {

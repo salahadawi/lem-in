@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/07 18:58:52 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 20:20:07 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:46:13 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem-in.h"
+#include "lem_in.h"
 
 int		room_in_links(t_room *room, t_link *link)
 {

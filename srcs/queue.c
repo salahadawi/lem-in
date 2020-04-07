@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/07 18:54:30 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 20:19:32 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:45:57 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "lem-in.h"
+#include "lem_in.h"
 
 void	enqueue(t_link **queue, t_room *new_room)
 {
