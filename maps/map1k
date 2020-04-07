@@ -1,7 +1,4 @@
-#Given 4000 nodes, 5% density
-#ANTS
 15
-#Here is the number of lines required: 32
 ##start
 Ubl5 3 3
 ##end
@@ -1282,4 +1279,3 @@ Kmt9-Iwa2
 Fhn9-Sep5
 Q_c8-Wuq3
 Fmi6-Kww9
-#Here is the number of lines required: 32
