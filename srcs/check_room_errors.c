@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 23:09:11 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/29 17:22:28 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:21:03 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/lem-in.h"
+#include "lem-in.h"
 
 void	check_room_errors(t_farm **farm)
 {
@@ -18,8 +18,6 @@ void	check_room_errors(t_farm **farm)
 	check_mandatory_commands(farm);
 }
 
-// currently checks 4000 rooms in around 0,09 seconds, merge sort and check for
-// duplicates might be significantly faster
 void	check_room_duplicates(t_farm **farm)
 {
 	t_room *room;

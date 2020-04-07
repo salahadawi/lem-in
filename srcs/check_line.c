@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 23:07:44 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/25 23:08:03 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:21:06 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/lem-in.h"
+#include "lem-in.h"
 
 int		check_line_comment(char *line)
 {

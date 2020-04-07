@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 21:00:27 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/05 21:12:30 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:20:04 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/lem-in.h"
+#include "lem-in.h"
 
 void	print_farm(t_farm *farm)
 {
@@ -26,7 +26,6 @@ void	print_farm(t_farm *farm)
 		if (farm->end == room)
 			ft_printf("#end\n");
 		ft_printf("%s %d %d\n", room->name, room->x, room->y);
-		ft_printf("Weight: %d\n", room->weight); //debug for room weight
 		room = room->next;
 	}
 	room = farm->first;
@@ -49,4 +48,5 @@ void	print_file(t_file *file)
 		ft_printf("%s\n", file->line);
 		file = file->next;
 	}
+	ft_printf("\n");
 }

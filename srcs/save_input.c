@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   lem-in.c                                           :+:      :+:    :+:   */
+/*   save_input.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/29 13:02:45 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:19:58 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/lem-in.h"
+#include "lem-in.h"
 
 void	save_line_file(t_farm **farm, char *line)
 {
@@ -39,9 +39,5 @@ t_farm	*save_input(void)
 	line = save_rooms(&farm);
 	check_room_errors(&farm);
 	save_links(&farm, line);
-	
 	return (farm);
 }
-
-//Remember to free file after everything
-//Maybe should learn more about optimal file reading and parsing?

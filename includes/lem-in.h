@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 12:53:00 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:11:35 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -94,7 +94,7 @@ int		get_line_room(t_room **room, char *line);
 
 int		save_line_room(t_farm **farm, t_room **room, char *line);
 
-int		save_command_room(t_farm **farm, t_room **room, char **line, int cmd);
+void	save_command_room(t_farm **farm, t_room **room, char **line, int cmd);
 
 char	*save_rooms(t_farm **farm);
 
@@ -131,5 +131,31 @@ void	free_farm(t_farm **farm);
 int		optimal_room(t_link *links, t_ant **ant, t_farm *farm);
 
 int		optimal_room1(t_link *links, t_ant **ant, t_farm *farm);
+
+void	enqueue(t_link **queue, t_room *new_room);
+
+t_room	*dequeue(t_link **queue);
+
+void	init_queue(t_link **queue, t_link **visited, t_farm **farm);
+
+void	create_ants(t_farm *farm, t_ant **first);
+
+void	check_links_valid(t_farm **farm);
+
+void	move_ants(t_farm **farm);
+
+t_room	*find_next_optimal_room(t_link *links, t_ant *ant, t_farm *farm);
+
+int		count_ants_in_line(t_ant *ant, t_farm *farm);
+
+t_ant	*new_ant(t_farm *farm, int *ant_number);
+
+void	remove_ant(t_ant **first, t_ant **ants);
+
+int		room_in_links(t_room *room, t_link *link);
+
+void	find_weights(t_farm **farm, int weight, t_link *queue);
+
+void	free_queue(t_link *queue);
 
 #endif

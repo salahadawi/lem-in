@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 20:58:02 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/06 16:29:39 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:20:36 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/lem-in.h"
+#include "lem-in.h"
 
 t_file	*file_new(char *line)
 {
@@ -57,5 +57,15 @@ void	init_farm(t_farm **farm)
 	if (ft_strchr(g_flags, '1'))
 		(*farm)->alg = optimal_room1;
 	else
-	(*farm)->alg = optimal_room;
+		(*farm)->alg = optimal_room;
+}
+
+t_ant	*new_ant(t_farm *farm, int *ant_number)
+{
+	t_ant *ant;
+
+	ant = (t_ant*)ft_memalloc(sizeof(t_ant));
+	ant->room = farm->start;
+	ant->number = (*ant_number)++;
+	return (ant);
 }

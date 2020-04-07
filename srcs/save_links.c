@@ -6,11 +6,11 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/29 13:00:17 by sadawi            #+#    #+#             */
-/*   Updated: 2020/03/29 18:06:55 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/04/07 20:20:00 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "includes/lem-in.h"
+#include "lem-in.h"
 
 void	get_line_link(char *line, char **link1, char **link2)
 {
@@ -46,7 +46,7 @@ void	link_rooms(t_room **room1, t_room **room2)
 		link2 = new_link(*room1);
 	else
 	{
-		while (link2->next) // function to cycle link until end
+		while (link2->next)
 			link2 = link2->next;
 		link2->next = new_link(*room1);
 	}
@@ -86,4 +86,10 @@ void	save_links(t_farm **farm, char *line)
 			save_links_to_rooms(farm, line);
 		save_line_file(farm, line);
 	}
+}
+
+void	check_links_valid(t_farm **farm)
+{
+	if ((*farm)->start->weight == MAX_INT)
+		handle_error("No path from start to end found.");
 }
