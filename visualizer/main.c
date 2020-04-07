@@ -785,7 +785,7 @@ t_move	*new_move(void)
 {
 	t_move *move;
 
-	move = (t_move*)malloc(sizeof(t_move));
+	move = (t_move*)ft_memalloc(sizeof(t_move));
 	move->x = 0;
 	move->y = 0;
 	move->next = NULL;
