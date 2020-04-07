@@ -1,3 +1,6 @@
 # Compiled source #
 *.a
 *.o
+lem-in
+visualizer
+notes
