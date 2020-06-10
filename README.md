@@ -14,6 +14,7 @@ Running the program with a valid map as input will print each move by each ant.
 * Each ant can move one room at a time, to a room that is connected to their current room.
 
 <h2 align="center">How does it work?</h2>
+
 Here is a valid graph in text:
 
 ```
