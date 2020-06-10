@@ -1,6 +1,6 @@
 <h1 align="center">Lem-in - Intelligent graph traversal.</h1>
 <p align="center">
-    <img src="https://github.com/salahadawi/filler/blob/master/images/filler_demo.gif">
+    <img src="https://github.com/salahadawi/lem-in/blob/master/images/lem-in_visualizer_demo.gif">
 </p>
 
 Lem-in is a project in which a set number of ants must find the shortest path through a graph from a start point to an end point. The ants must strategically work together to minimize the amount of moves done.
@@ -12,7 +12,8 @@ Running the program with a valid map as input will print each move by each ant.
 * Each ant can move one room at a time, to a room that is connected to their current room.
 
 <h2 align="center">How does it work?</h2>
-Here is a valid graph in text:
+Here is a valid graph in text:  
+  
 
 ```
 #number of ants
