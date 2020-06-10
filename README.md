@@ -45,6 +45,11 @@ Here is a valid graph in text:
 7-4
 6-5
 ```
+First the amount of ants inside the graph is listed. 
+
+Then, each room is listed in the format `name x_pos y_pos`. 
+
+Then, all links between the rooms is listed in the format `room1_name-room2_name`
 
 Here's what the room looks like visually:
 <p align="center">
