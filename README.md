@@ -7,6 +7,8 @@ Lem-in is a project in which a set number of ants must find the shortest path th
 
 Running the program with a valid map as input will print each move by each ant.
 
+To ease use and testing, i coded a graphical visualizer with SDL2 to simulate the graph and each ants moves.
+
 <h2 align="center">Rules</h2>
 
 All ants must reach the end room while following some rules:
@@ -69,6 +71,23 @@ the AI will generate a heatmap of the grid, with each coordinate getting a value
   
 The strategy used is to place blocks as near to the opponent as possible,
 with the intention of blocking the opponents paths and limiting their following moves.
+
+<h2 align="center">Visualizer</h2>
+
+The visualizer will read the output of the lem_in program, and use it to simulate the graph. Each ant and their moves are saved, and can be viewed one step at a time.
+
+### Controls
+```
+* Mousewheel to zoom in/out
+
+* Hold mouse1/mouse2 and drag to move map
+
+* Right arrow key for next move
+
+* Left arrow key for previous move
+
+* Up/down arrow keys to control ant animation speed
+```
 
 <h2 align="center">Algorithm</h2>
 
