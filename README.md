@@ -86,6 +86,18 @@ The visualizer will read the output of the lem_in program, and use it to simulat
 
 <h2 align="center">Algorithm</h2>
 
+I decided to attempt creating my own algorithm to solve this exercise. 
+
+Moving the ants from a starting point to an ending point while following the necessary rules is easy. The challenge comes with making the ants work as a team, with some ants having to occasionally take less optimal paths to avoid blocking an other ants moves.
+
+### Preprocessing
+First, each room in the graph is given a value. This value corresponds to how many moves it will take to reach the end room from that room.
+
+### Ant Movement
+Then, the ants will start moving. Each ant will check the available paths, do some calculations, and choose the move it thinks is best.
+
+To calculate the best move, the ant will check how many ants are behind it. With this information, the ant can take a longer path, and leave a shorter path free for the next ants to use, effectively helping other ants reach the end quicker.
+
 <h2 align="center">Usage</h2>
 
 1. Clone the repo:
