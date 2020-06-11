@@ -6,7 +6,7 @@
 #    By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/02 18:52:09 by sadawi            #+#    #+#              #
-#    Updated: 2020/04/02 18:52:55 by sadawi           ###   ########.fr        #
+#    Updated: 2020/06/11 13:05:08 by sadawi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -20,3 +20,7 @@ all:
 
 noflags:
 	gcc $(SRCS) $(LIBS) -o $(NAME)
+
+fclean:
+	@/bin/rm -f $(NAME)
+	@echo Clean successful!
