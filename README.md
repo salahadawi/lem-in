@@ -76,15 +76,21 @@ with the intention of blocking the opponents paths and limiting their following 
 
 1. Clone the repo:
 ```
-git clone https://github.com/salahadawi/filler.git
+git clone https://github.com/salahadawi/lem-in.git
 ```
-2. Compile the project:
+2. Compile the project and the visualizer:
 ```
-make
+make && make -C visualizer
 ```
 
-3. Run the AI against a simple practice AI:
+3. Run the project with a map:
 ```
-./filler_vm -f maps/map00 -p1 ./sadawi.filler -p2 ./players/random.filler
+./lem-in < maps/mapgrid
 ```
+
+4. Run the project with a map and visualize it:
+```
+./lem-in < maps/mapgrid | ./visualizer/visualizer
+```
+
 The game will be output to the terminal.
