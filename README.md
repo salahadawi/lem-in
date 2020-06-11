@@ -19,7 +19,7 @@ All ants must reach the end room while following some rules:
 
 <h2 align="center">How does it work?</h2>
 
-Here is a valid graph in text:
+### Here is a valid graph in text:
 
 ```
 #number of ants
@@ -55,12 +55,13 @@ Then, each room is listed in the format `name x_pos y_pos`.
 
 Then, all links between the rooms is listed in the format `room1_name-room2_name`
 
-Here's what the room looks like visually:
+### Here's what the room looks like visually:
 <p align="center">
     <img src="https://github.com/salahadawi/lem-in/blob/master/images/lem-in_graph.png">
 </p>
 
-And in my visualizer:
+### And in my visualizer:
+
 <p align="center">
     <img src="https://github.com/salahadawi/lem-in/blob/master/images/lem-in_graph_visualizer.png">
 </p>
