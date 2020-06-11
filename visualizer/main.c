@@ -1009,6 +1009,7 @@ int	main(int argc, char **argv)
 
 	(void)argc;
 	(void)argv;
+	chdir("visualizer");
 	lem_in = init_lem_in();
 	save_input(lem_in);
 	normalize_distances(lem_in);
