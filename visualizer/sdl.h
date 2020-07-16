@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 18:53:51 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/06 13:30:17 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/16 14:17:45 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,7 @@
 # define SCREEN_WIDTH 1600
 # define SCREEN_HEIGHT 900
 # define MAX_INT 2147483647
-# define MIN_INT - 2147483648
+# define MIN_INT -2147483648
 # define START 1
 # define END 2
 
@@ -30,10 +30,9 @@ enum				e_sorting_mode
 	SORT_ROOM_Y
 };
 
-
 typedef	struct			s_file
 {
-	char 				*line;
+	char				*line;
 	int					executed;
 	struct s_file		*next;
 	struct s_file		*prev;
@@ -71,7 +70,7 @@ typedef struct			s_move
 	struct s_move		*next;
 }						t_move;
 
-typedef	struct 			s_ant
+typedef	struct			s_ant
 {
 	int					number;
 	t_room				*room;
