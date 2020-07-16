@@ -7,6 +7,8 @@ Lem-in is a project in which a set number of ants must find the shortest path th
 
 Running the program with a valid map as input will print each move by each ant.
 
+To ease use and testing, i coded a graphical visualizer with SDL2 to simulate the graph and each ants moves.
+
 <h2 align="center">Rules</h2>
 
 All ants must reach the end room while following some rules:
@@ -17,7 +19,7 @@ All ants must reach the end room while following some rules:
 
 <h2 align="center">How does it work?</h2>
 
-Here is a valid graph in text:
+### Here is a valid graph in text:
 
 ```
 #number of ants
@@ -53,24 +55,48 @@ Then, each room is listed in the format `name x_pos y_pos`.
 
 Then, all links between the rooms is listed in the format `room1_name-room2_name`
 
-Here's what the room looks like visually:
+### Here's what the room looks like visually:
+
 <p align="center">
     <img src="https://github.com/salahadawi/lem-in/blob/master/images/lem-in_graph.png">
 </p>
 
-And in my visualizer:
+### And in my visualizer:
+
 <p align="center">
     <img src="https://github.com/salahadawi/lem-in/blob/master/images/lem-in_graph_visualizer.png">
 </p>
 
-The above image on the left shows a board state given to the AI. Playing as 'X',
-the AI will generate a heatmap of the grid, with each coordinate getting a value equal to it's distance to the nearest opposing players block.  
-  
-  
-The strategy used is to place blocks as near to the opponent as possible,
-with the intention of blocking the opponents paths and limiting their following moves.
+<h2 align="center">Visualizer</h2>
+
+The visualizer will read the output of the lem_in program, and use it to simulate the graph. Each ant and their moves are saved, and can be viewed one step at a time.
+
+### Controls
+```
+* Mousewheel to zoom in/out
+
+* Hold mouse1/mouse2 and drag to move map
+
+* Right arrow key for next move
+
+* Left arrow key for previous move
+
+* Up/down arrow keys to control ant animation speed
+```
 
 <h2 align="center">Algorithm</h2>
+
+I decided to attempt creating my own algorithm to solve this exercise. 
+
+Moving the ants from a starting point to an ending point while following the necessary rules is easy. The challenge comes with making the ants work as a team, with some ants having to occasionally take less optimal paths to avoid blocking other ants.
+
+### Preprocessing
+First, each room in the graph is given a value. This value corresponds to how many moves it will take to reach the end room from that room. The end room always has a value of 0, rooms directly connected to it have a value of 1... and so on.
+
+### Ant Movement
+Then, the ants will start moving. Each ant will check the available paths, do some calculations, and choose the move it thinks is best.
+
+To calculate the best move, the ant will check how many ants are behind it. With this information, the ant can take a longer path, and leave a shorter path free for the next ants to use, effectively helping other ants reach the end quicker.
 
 <h2 align="center">Usage</h2>
 
@@ -92,5 +118,3 @@ make && make -C visualizer
 ```
 ./lem-in < maps/mapgrid | ./visualizer/visualizer
 ```
-
-The game will be output to the terminal.
