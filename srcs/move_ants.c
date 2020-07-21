@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/07 18:56:21 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 20:46:02 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/21 14:30:29 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,9 +14,11 @@
 
 void	move_ants(t_farm **farm)
 {
-	t_ant *ants;
-	t_ant *first;
+	t_ant	*ants;
+	t_ant	*first;
+	int		moves;
 
+	moves = 0;
 	create_ants(*farm, &first);
 	while (first)
 	{
@@ -34,8 +36,9 @@ void	move_ants(t_farm **farm)
 			else
 				ants = ants->next;
 		}
-		ft_printf("\n");
+		ft_printf("\n", moves++);
 	}
+	ft_printf((ft_strchr(g_flags, 'v') ? "%d" : ""), moves);
 }
 
 int		optimal_room(t_link *links, t_ant **ant, t_farm *farm)
