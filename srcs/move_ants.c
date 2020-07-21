@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/07 18:56:21 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/21 14:30:29 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/21 14:32:28 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	move_ants(t_farm **farm)
 		}
 		ft_printf("\n", moves++);
 	}
-	ft_printf((ft_strchr(g_flags, 'v') ? "%d" : ""), moves);
+	ft_printf((ft_strchr(g_flags, 'v') ? "#Total moves: %d" : ""), moves);
 }
 
 int		optimal_room(t_link *links, t_ant **ant, t_farm *farm)
