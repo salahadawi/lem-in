@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 20:38:51 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/22 19:45:09 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,11 +36,14 @@ typedef	struct		s_room
 	int				weight;
 	struct s_room	*next;
 	struct s_link	*links;
+	struct s_room	*parent;
 }					t_room;
 
 typedef	struct		s_link
 {
 	t_room			*room;
+	int				flow;
+	int				weight;
 	struct s_link	*next;
 }					t_link;
 
@@ -51,6 +54,13 @@ typedef	struct		s_ant
 	struct s_ant	*next;
 }					t_ant;
 
+typedef struct		s_path
+{
+	char			*id;
+	t_link			*path;
+	struct s_path	*next;
+}					t_path;
+
 typedef	struct		s_farm
 {
 	t_file			*file_start;
@@ -60,6 +70,7 @@ typedef	struct		s_farm
 	t_room			*start;
 	t_room			*end;
 	t_room			*first;
+	t_path			*paths;
 	int				(*alg)(t_link*, t_ant**, struct s_farm*);
 }					t_farm;
 
@@ -159,5 +170,7 @@ int					room_in_links(t_room *room, t_link *link);
 void				find_weights(t_farm **farm, int weight, t_link *queue);
 
 void				free_queue(t_link *queue);
+
+void				save_paths(t_farm **farm);
 
 #endif
