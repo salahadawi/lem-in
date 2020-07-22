@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/07 18:54:30 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 20:45:57 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/22 14:29:21 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,9 +51,8 @@ void	init_queue(t_link **queue, t_link **visited, t_farm **farm)
 {
 	*queue = NULL;
 	*visited = NULL;
-	enqueue(visited, (*farm)->start);
-	(*farm)->end->weight = 0;
-	enqueue(queue, (*farm)->end);
+	(*farm)->start->weight = 0;
+	enqueue(queue, (*farm)->start);
 }
 
 void	free_queue(t_link *queue)
