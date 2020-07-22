@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 22:54:44 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 20:46:04 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/22 17:15:38 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ int		main(int argc, char **argv)
 	check_links_valid(&farm);
 	print_file(farm->file_start);
 	farm->start->occupied = 1;
-	move_ants(&farm);
+	save_paths(&farm);
+	//move_ants(&farm);
 	free_farm(&farm);
 	free(g_flags);
 	return (0);
