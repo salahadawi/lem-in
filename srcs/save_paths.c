@@ -419,12 +419,12 @@ void	get_flow_paths(t_farm **farm)
 	}
 }
 
-void	print_paths(t_farm **farm)
+void	print_paths(t_path *paths)
 {
 	t_path *path;
 	t_link *rooms;
 
-	path = (*farm)->paths;
+	path = paths;
 	while (path)
 	{
 		rooms = path->path;
@@ -486,16 +486,24 @@ void	print_flow(t_farm **farm, t_link *queue)
 	free_queue(visited);
 }
 
-void	get_paths(t_farm **farm)
+t_path	*get_paths(t_farm **farm)
 {
+	t_path	*path_head;
+	t_path	*tmp;
+	t_link	*cur_head;
+	t_link	*path;
 	t_link	*links;
 	t_link	*cur;
 
+	path_head = NULL;
+	tmp = NULL;
 	links = (*farm)->start->links;
 	while (links)
 	{
 		if (links->flow)
 		{
+			path = new_link((*farm)->start);
+			cur_head = path;
 			ft_printf("%s",(*farm)->start->name);
 			cur = links;
 			while (cur)
@@ -503,22 +511,39 @@ void	get_paths(t_farm **farm)
 				//ft_printf("checking %s...", cur->room->name);
 				if (cur->flow == 1)
 				{
+					path->next = new_link(cur->room);
+					path = path->next;
 					ft_printf("->%s", cur->room->name);
 					cur = cur->room->links;
 				}
 				else
 					cur = cur->next;
 			}
+			ft_printf("\n");
+			if (path_head)
+			{
+				tmp->next = create_path(cur_head);
+				tmp = tmp->next;
+			}
+			else
+			{
+				tmp = create_path(cur_head);
+				path_head = tmp;
+			}
 		}
-		ft_printf("\n");
 		links = links->next;
 	}
+	return (path_head);
 }
 
 void	save_paths(t_farm **farm)
 {
+	t_path	*final_paths;
+
+
 	get_flow_paths(farm);
-	print_paths(farm);
+	print_paths((*farm)->paths);
 	print_flow(farm, NULL);
-	get_paths(farm);
+	final_paths = get_paths(farm);
+	print_paths(final_paths);
 }
