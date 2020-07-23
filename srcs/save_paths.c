@@ -6,13 +6,13 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/21 15:34:05 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/22 23:05:02 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/23 20:25:41 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lem_in.h"
 
-void	reset_weights(t_farm **farm, int weight, t_link *queue)
+/* void	reset_weights(t_farm **farm, int weight, t_link *queue)
 {
 	t_room	*neighbor;
 	t_link	*visited;
@@ -39,8 +39,8 @@ void	reset_weights(t_farm **farm, int weight, t_link *queue)
 	}
 	free_queue(visited);
 }
-
-void	print_weights(t_farm **farm, t_link *queue)
+ */
+/* void	print_weights(t_farm **farm, t_link *queue)
 {
 	t_room	*neighbor;
 	t_link	*visited;
@@ -66,9 +66,9 @@ void	print_weights(t_farm **farm, t_link *queue)
 		enqueue(&visited, dequeue(&queue));
 	}
 	free_queue(visited);
-}
+} */
 
-void	find_weights2(t_farm **farm, int weight, t_link *queue)
+/* void	find_weights2(t_farm **farm, int weight, t_link *queue)
 {
 	t_room	*neighbor;
 	t_link	*visited;
@@ -102,7 +102,7 @@ void	find_weights2(t_farm **farm, int weight, t_link *queue)
 		weight++;
 	}
 	free_queue(visited);
-}
+} */
 
 int		adjust_flow(t_room *room1, t_room *room2)
 {
@@ -178,7 +178,7 @@ void	adjust_weight(t_room *room1, t_room *room2, int weight)
 	ft_printf("%d\n", tmp2->weight);
 }
 
-void	save_paths2(t_farm **farm)
+/* void	save_paths2(t_farm **farm)
 {
 	t_room *tmp;
 	t_link *link;
@@ -212,7 +212,7 @@ void	save_paths2(t_farm **farm)
 	//print_weights(farm, NULL);
 	find_weights2(farm, 1, NULL);
 	print_weights(farm, NULL);
-}
+} */
 
 void	reset_parents(t_farm **farm, t_link *queue)
 {
