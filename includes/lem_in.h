@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/22 19:45:09 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/24 14:08:59 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,12 +51,14 @@ typedef	struct		s_ant
 {
 	int				number;
 	t_room			*room;
+	t_link			*path;
 	struct s_ant	*next;
 }					t_ant;
 
 typedef struct		s_path
 {
 	char			*id;
+	int				size;
 	t_link			*path;
 	struct s_path	*next;
 }					t_path;
@@ -71,6 +73,7 @@ typedef	struct		s_farm
 	t_room			*end;
 	t_room			*first;
 	t_path			*paths;
+	int				paths_amount;
 	int				(*alg)(t_link*, t_ant**, struct s_farm*);
 }					t_farm;
 
