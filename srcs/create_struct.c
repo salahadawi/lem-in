@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 20:58:02 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 20:46:23 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/24 14:26:35 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,12 +60,26 @@ void	init_farm(t_farm **farm)
 		(*farm)->alg = optimal_room;
 }
 
+t_link	*assign_ant_path(t_farm *farm, int ant_number)
+{
+	int		path_number;
+	t_path	*paths;
+
+	path_number = ant_number % farm->paths_amount;
+	paths = farm->paths;
+	while (path_number--)
+		paths = paths->next;
+	return (paths->path);
+	
+}
+
 t_ant	*new_ant(t_farm *farm, int *ant_number)
 {
 	t_ant *ant;
 
 	ant = (t_ant*)ft_memalloc(sizeof(t_ant));
 	ant->room = farm->start;
-	ant->number = (*ant_number)++;
+	ant->number = (*ant_number);
+	ant->path = assign_ant_path(farm, (*ant_number)++);
 	return (ant);
 }

@@ -6,11 +6,25 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/07 18:56:21 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/21 14:32:28 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/24 14:48:57 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lem_in.h"
+
+int		ant_move_through_path(t_ant **ant, t_farm *farm)
+{
+	if (!(*ant)->path->next->room->occupied)
+	{
+		(*ant)->path->room->occupied = 0;
+		(*ant)->path = (*ant)->path->next;
+		if ((*ant)->path->room != farm->end)
+			(*ant)->path->room->occupied = 1;
+		return (1);
+	}
+	else
+		return (0);
+}
 
 void	move_ants(t_farm **farm)
 {
@@ -25,9 +39,9 @@ void	move_ants(t_farm **farm)
 		ants = first;
 		while (ants)
 		{
-			if ((*farm)->alg(ants->room->links, &ants, *farm))
-				ft_printf("L%d-%s ", ants->number, ants->room->name);
-			if (ants->room == (*farm)->end)
+			if (ant_move_through_path(&ants, *farm))
+				ft_printf("L%d-%s ", ants->number, ants->path->room->name);
+			if (ants->path->room == (*farm)->end)
 			{
 				if (ants == first)
 					first = ants->next;

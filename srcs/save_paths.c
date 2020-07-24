@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/21 15:34:05 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/23 21:38:13 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/24 14:53:29 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,7 +126,7 @@ int		adjust_flow(t_room *room1, t_room *room2)
 	else
 		tmp1->flow = 0;
 	//tmp1->flow = -(tmp1->flow == -1 || tmp1->flow == 0);
-	ft_printf(" Flow: %d,", tmp1->flow);
+	ft_printf("# Flow: %d,", tmp1->flow);
 	tmp2 = room2->links;
 	while (tmp2->room != room1)
 		tmp2 = tmp2->next;
@@ -152,7 +152,7 @@ int		adjust_flow2(t_room *room1, t_room *room2)
 		value = 1;
 	return (value);
 	tmp1->flow = -(!tmp1->flow);
-	ft_printf(" Flow: %d,", tmp1->flow);
+	ft_printf("# Flow: %d,", tmp1->flow);
 	tmp2 = room2->links;
 	while (tmp2->room != room1)
 		tmp2 = tmp2->next;
@@ -345,7 +345,7 @@ void	remove_flow(t_room *room1, t_room *room2)
 		tmp1 = tmp1->next;
 	tmp1->flow++;
 	//tmp1->flow = -(tmp1->flow == -1 || tmp1->flow == 0);
-	ft_printf(" Flow: %d,", tmp1->flow);
+	ft_printf("# Flow: %d,", tmp1->flow);
 	tmp2 = room2->links;
 	while (tmp2->room != room1)
 		tmp2 = tmp2->next;
@@ -388,12 +388,13 @@ void	augment_path(t_farm **farm, t_link *new_path)
 	}
 }
 
-t_path	*create_path(t_link *path)
+t_path	*create_path(t_link *path, int size)
 {
 	t_path *new_path;
 
 	new_path = (t_path*)ft_memalloc(sizeof(t_path));
 	new_path->path = path;
+	new_path->size = size;
 	new_path->id = path->next->room->name;
 	return (new_path);
 }
@@ -407,32 +408,34 @@ void	get_flow_paths(t_farm **farm)
 	{
 		augment_path(farm, new_path);
 		if (!(*farm)->paths)
-			(*farm)->paths = create_path(new_path);
+			(*farm)->paths = create_path(new_path, 0);
 		else
 		{
 			tmp = (*farm)->paths;
 			while (tmp->next)
 				tmp = tmp->next;
-			tmp->next = create_path(new_path);
+			tmp->next = create_path(new_path, 0);
 			tmp = tmp->next;
 		}
 	}
 }
 
-void	print_paths(t_path *paths)
+void	print_paths(t_farm *farm, t_path *paths)
 {
 	t_path *path;
 	t_link *rooms;
 
 	path = paths;
+	ft_printf("Paths amount: %d\n", farm->paths_amount);
 	while (path)
 	{
 		rooms = path->path;
 		while (rooms)
 		{
-			ft_printf(rooms->next ? "%s->" : "%s\n", rooms->room->name);
+			ft_printf(rooms->next ? "%s->" : "%s", rooms->room->name);
 			rooms = rooms->next;
 		}
+		ft_printf(" size: %d\n", path->size);
 		path = path->next;
 	}
 }
@@ -447,7 +450,7 @@ int		find_flow(t_room *room1, t_room *room2)
 	tmp1 = room1->links;
 	while (tmp1->room != room2)
 		tmp1 = tmp1->next;
-	ft_printf(" Flow: %d,", tmp1->flow);
+	ft_printf("# Flow: %d,", tmp1->flow);
 	tmp2 = room2->links;
 	while (tmp2->room != room1)
 		tmp2 = tmp2->next;
@@ -494,6 +497,7 @@ t_path	*get_paths(t_farm **farm)
 	t_link	*path;
 	t_link	*links;
 	t_link	*cur;
+	int		size;
 
 	path_head = NULL;
 	tmp = NULL;
@@ -502,9 +506,11 @@ t_path	*get_paths(t_farm **farm)
 	{
 		if (links->flow)
 		{
+			size = 1;
 			path = new_link((*farm)->start);
+			(*farm)->paths_amount++;
 			cur_head = path;
-			ft_printf("%s",(*farm)->start->name);
+			ft_printf("#%s",(*farm)->start->name);
 			cur = links;
 			while (cur)
 			{
@@ -514,6 +520,7 @@ t_path	*get_paths(t_farm **farm)
 					path->next = new_link(cur->room);
 					path = path->next;
 					ft_printf("->%s", cur->room->name);
+					size++;
 					cur = cur->room->links;
 				}
 				else
@@ -522,12 +529,12 @@ t_path	*get_paths(t_farm **farm)
 			ft_printf("\n");
 			if (path_head)
 			{
-				tmp->next = create_path(cur_head);
+				tmp->next = create_path(cur_head, size);
 				tmp = tmp->next;
 			}
 			else
 			{
-				tmp = create_path(cur_head);
+				tmp = create_path(cur_head, size);
 				path_head = tmp;
 			}
 		}
@@ -542,10 +549,10 @@ void	save_paths(t_farm **farm)
 
 
 	get_flow_paths(farm);
-	print_paths((*farm)->paths);
-	print_flow(farm, NULL);
+	//print_paths(*farm, (*farm)->paths);
+	//print_flow(farm, NULL);
 	final_paths = get_paths(farm);
-	print_paths(final_paths);
+	//print_paths(*farm, final_paths);
 	(*farm)->paths = final_paths;
 }
 
