@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/24 14:08:59 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/24 15:47:30 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,7 @@ typedef struct		s_path
 {
 	char			*id;
 	int				size;
+	int				ants_amount;
 	t_link			*path;
 	struct s_path	*next;
 }					t_path;
