@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/21 15:34:05 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/24 14:53:29 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/24 15:57:06 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -426,10 +426,11 @@ void	print_paths(t_farm *farm, t_path *paths)
 	t_link *rooms;
 
 	path = paths;
-	ft_printf("Paths amount: %d\n", farm->paths_amount);
+	ft_printf("#Paths amount: %d\n", farm->paths_amount);
 	while (path)
 	{
 		rooms = path->path;
+		ft_printf("#");
 		while (rooms)
 		{
 			ft_printf(rooms->next ? "%s->" : "%s", rooms->room->name);
