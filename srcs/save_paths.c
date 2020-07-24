@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/21 15:34:05 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/23 20:25:41 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/23 21:38:13 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -546,4 +546,7 @@ void	save_paths(t_farm **farm)
 	print_flow(farm, NULL);
 	final_paths = get_paths(farm);
 	print_paths(final_paths);
+	(*farm)->paths = final_paths;
 }
+
+//clean up everything, free memory
