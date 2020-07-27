@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/21 15:34:05 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/24 15:57:06 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/07/27 16:17:06 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -126,12 +126,12 @@ int		adjust_flow(t_room *room1, t_room *room2)
 	else
 		tmp1->flow = 0;
 	//tmp1->flow = -(tmp1->flow == -1 || tmp1->flow == 0);
-	ft_printf("# Flow: %d,", tmp1->flow);
+	//ft_printf("# Flow: %d,", tmp1->flow);
 	tmp2 = room2->links;
 	while (tmp2->room != room1)
 		tmp2 = tmp2->next;
 	tmp2->flow = -(tmp1->flow);
-	ft_printf("%d\n", tmp2->flow);
+	//ft_printf("%d\n", tmp2->flow);
 	return (value);
 }
 
@@ -152,12 +152,12 @@ int		adjust_flow2(t_room *room1, t_room *room2)
 		value = 1;
 	return (value);
 	tmp1->flow = -(!tmp1->flow);
-	ft_printf("# Flow: %d,", tmp1->flow);
+	//ft_printf("# Flow: %d,", tmp1->flow);
 	tmp2 = room2->links;
 	while (tmp2->room != room1)
 		tmp2 = tmp2->next;
 	tmp2->flow = -(tmp1->flow);
-	ft_printf("%d\n", tmp2->flow);
+	//ft_printf("%d\n", tmp2->flow);
 	return (value);
 }
 
@@ -170,12 +170,12 @@ void	adjust_weight(t_room *room1, t_room *room2, int weight)
 	while (tmp1->room != room2)
 		tmp1 = tmp1->next;
 	tmp1->weight = weight;
-	ft_printf(" Weight: %d,", tmp1->weight);
+	//ft_printf(" Weight: %d,", tmp1->weight);
 	tmp2 = room2->links;
 	while (tmp2->room != room1)
 		tmp2 = tmp2->next;
 	tmp2->weight = weight;
-	ft_printf("%d\n", tmp2->weight);
+	//ft_printf("%d\n", tmp2->weight);
 }
 
 /* void	save_paths2(t_farm **farm)
@@ -256,6 +256,20 @@ int		check_path(t_room *neighbor, t_link *links)
 	return (1);
 }
 
+int		check_path_has_start(t_farm **farm, t_room *neighbor, int parent_num)
+{
+	(void)parent_num;
+	int i = 0;
+	while (neighbor->parent_num >= parent_num && neighbor != (*farm)->start && i++ < 200)
+	{
+		neighbor = neighbor->parent;
+	}
+	if (neighbor != (*farm)->start)
+		return (0);
+	return (1);
+}
+
+
 t_link	*get_flow_path(t_farm **farm, t_link *queue, t_link *path)
 {
 	t_link	*path_head;
@@ -290,23 +304,23 @@ t_link	*get_flow_path(t_farm **farm, t_link *queue, t_link *path)
 				if (!neighbor->parent || neighbor == (*farm)->end)
 				{
 					neighbor->parent = cur->room;
-					ft_printf("#%s, neighbor of: %s\n", neighbor->name, cur->room->name);
+					//ft_printf("#%s, neighbor of: %s\n", neighbor->name, cur->room->name);
 				}
 			}
 			if (neighbor == (*farm)->end)
 			{
-				ft_printf("#FOUND LINK %s-%s WITH FLOW: %d\n", cur->room->name, neighbor->name, links->flow);
+				//ft_printf("#FOUND LINK %s-%s WITH FLOW: %d\n", cur->room->name, neighbor->name, links->flow);
 				if (links->flow)
 				{
 					if (!check_path(neighbor, links))
 					{
-						ft_printf("#Bad path, discarding...\n");
+						//ft_printf("#Bad path, discarding...\n");
 						break;
 					}
-					else
-						ft_printf("#Augmenting path found!\n");
+					//else
+						//ft_printf("#Augmenting path found!\n");
 				}
-				ft_printf("#%s\n#|", neighbor->name);
+				//ft_printf("#%s\n#|", neighbor->name);
 				path = new_link(neighbor);
 				path_head = path;
 				adjust_flow(neighbor, neighbor->parent);
@@ -316,11 +330,11 @@ t_link	*get_flow_path(t_farm **farm, t_link *queue, t_link *path)
 					neighbor = neighbor->parent;
 					path->next = new_link(neighbor);
 					path = path->next;
-					ft_printf(neighbor->parent ? "#%s\n#|" : "#%s", neighbor->name);
+					//ft_printf(neighbor->parent ? "#%s\n#|" : "#%s", neighbor->name);
 					if (neighbor->parent)
 						weight += adjust_flow(neighbor, neighbor->parent);
 				}
-				ft_printf("\n#Path total weight: %d", weight);
+				//ft_printf("\n#Path total weight: %d", weight);
 				adjust_weight((*farm)->end, (*farm)->end->parent, weight);
 				reset_parents(farm, NULL);
 				return (path_head);
@@ -330,7 +344,97 @@ t_link	*get_flow_path(t_farm **farm, t_link *queue, t_link *path)
 		enqueue(&visited, dequeue(&queue));
 	}
 	free_queue(visited);
-	ft_printf("#No path found!\n");
+	//ft_printf("#No path found!\n");
+	reset_parents(farm, NULL);
+	return (NULL);
+}
+
+t_link	*get_flow_path2(t_farm **farm, t_link *queue, t_link *path, int parent_num)
+{
+	t_link	*path_head;
+	t_room	*neighbor;
+	t_link	*visited;
+	t_link	*links;
+	t_link	*cur;
+
+	init_queue(&queue, &visited, farm);
+	while (queue)
+	{
+		cur = queue;
+		while (cur->next)
+			cur = cur->next;
+		links = cur->room->links;
+		if (cur->room == (*farm)->end)
+		{
+			enqueue(&visited, dequeue(&queue));
+			continue;
+		}
+		while (links)
+		{
+			neighbor = links->room;
+			if (cur->room == (*farm)->start && links->flow)
+			{
+				links = links->next;
+				continue;
+			}
+			if (!room_in_links(neighbor, visited) || neighbor == (*farm)->end)
+			{
+				enqueue(&queue, neighbor);
+				if (neighbor->parent_num < parent_num && !links->flow)
+				{
+					//enqueue(&queue, neighbor);
+					neighbor->parent = cur->room;
+					neighbor->parent_num = parent_num;
+					//ft_printf("#%s, neighbor of: %s\n", neighbor->name, cur->room->name);
+				}
+			}
+			if (neighbor == (*farm)->end)
+			{
+				//ft_printf("#FOUND LINK %s-%s WITH FLOW: %d\n", cur->room->name, neighbor->name, links->flow);
+				if (links->flow)
+				{
+					links = links->next;
+					continue;
+					if (!check_path(neighbor, links))
+					{
+						//ft_printf("#Bad path, discarding...\n");
+						break;
+					}
+					//else
+						//ft_printf("#Augmenting path found!\n");
+				}
+				//if (!check_path_has_start(farm, neighbor, parent_num))
+				//{
+				//	links = links->next;
+				//	continue;
+				//}
+				//ft_printf("#%s\n#|", neighbor->name);
+				path = new_link(neighbor);
+				path_head = path;
+				adjust_flow(neighbor, neighbor->parent);
+				int weight = 1;
+				while (neighbor->parent && !neighbor->parent->flow)
+				{
+					neighbor = neighbor->parent;
+					path->next = new_link(neighbor);
+					path = path->next;
+					//ft_printf(neighbor->parent ? "#%s\n#|" : "#%s", neighbor->name);
+					if (neighbor->parent_num >= parent_num)
+						weight += adjust_flow(neighbor, neighbor->parent);
+					neighbor->flow = 1;
+				}
+				//ft_printf("\n#Path total weight: %d", weight);
+				//adjust_weight((*farm)->end, (*farm)->end->parent, weight);
+				//reset_parents(farm, NULL);
+				parent_num++;
+				return (path_head);
+			}
+			links = links->next;
+		}
+		enqueue(&visited, dequeue(&queue));
+	}
+	free_queue(visited);
+	//ft_printf("#No path found!\n");
 	reset_parents(farm, NULL);
 	return (NULL);
 }
@@ -345,12 +449,12 @@ void	remove_flow(t_room *room1, t_room *room2)
 		tmp1 = tmp1->next;
 	tmp1->flow++;
 	//tmp1->flow = -(tmp1->flow == -1 || tmp1->flow == 0);
-	ft_printf("# Flow: %d,", tmp1->flow);
+	//ft_printf("# Flow: %d,", tmp1->flow);
 	tmp2 = room2->links;
 	while (tmp2->room != room1)
 		tmp2 = tmp2->next;
 	tmp2->flow = -(tmp1->flow);
-	ft_printf("%d\n", tmp2->flow);
+	//ft_printf("%d\n", tmp2->flow);
 }
 
 void	remove_path_flow(t_link *path)
@@ -399,6 +503,30 @@ t_path	*create_path(t_link *path, int size)
 	return (new_path);
 }
 
+void	get_flow_paths2(t_farm **farm)
+{
+	t_path	*tmp;
+	t_link	*new_path;
+	int		parent_num;
+
+	parent_num = 1;
+	while ((new_path = get_flow_path2(farm, NULL, NULL, parent_num++)))
+	{
+		//augment_path(farm, new_path);
+		if (!(*farm)->paths)
+			(*farm)->paths = create_path(new_path, 0);
+		else
+		{
+			tmp = (*farm)->paths;
+			while (tmp->next)
+				tmp = tmp->next;
+			tmp->next = create_path(new_path, 0);
+			tmp = tmp->next;
+		}
+		ft_printf("path found!");
+	}
+}
+
 void	get_flow_paths(t_farm **farm)
 {
 	t_path	*tmp;
@@ -417,6 +545,7 @@ void	get_flow_paths(t_farm **farm)
 			tmp->next = create_path(new_path, 0);
 			tmp = tmp->next;
 		}
+		ft_printf("path found!");
 	}
 }
 
@@ -451,11 +580,11 @@ int		find_flow(t_room *room1, t_room *room2)
 	tmp1 = room1->links;
 	while (tmp1->room != room2)
 		tmp1 = tmp1->next;
-	ft_printf("# Flow: %d,", tmp1->flow);
+	//ft_printf("# Flow: %d,", tmp1->flow);
 	tmp2 = room2->links;
 	while (tmp2->room != room1)
 		tmp2 = tmp2->next;
-	ft_printf("%d\n", tmp2->flow);
+	//ft_printf("%d\n", tmp2->flow);
 	return (value);
 }
 
@@ -511,7 +640,7 @@ t_path	*get_paths(t_farm **farm)
 			path = new_link((*farm)->start);
 			(*farm)->paths_amount++;
 			cur_head = path;
-			ft_printf("#%s",(*farm)->start->name);
+			//ft_printf("#%s",(*farm)->start->name);
 			cur = links;
 			while (cur)
 			{
@@ -520,14 +649,14 @@ t_path	*get_paths(t_farm **farm)
 				{
 					path->next = new_link(cur->room);
 					path = path->next;
-					ft_printf("->%s", cur->room->name);
+					//ft_printf("->%s", cur->room->name);
 					size++;
 					cur = cur->room->links;
 				}
 				else
 					cur = cur->next;
 			}
-			ft_printf("\n");
+			//ft_printf("\n");
 			if (path_head)
 			{
 				tmp->next = create_path(cur_head, size);
@@ -606,9 +735,10 @@ void	save_paths(t_farm **farm)
 	t_path	*final_paths;
 
 
-	get_flow_paths(farm);
-	//print_paths(*farm, (*farm)->paths);
+	get_flow_paths2(farm);
+	print_paths(*farm, (*farm)->paths);
 	//print_flow(farm, NULL);
+	ft_printf("stuck here");
 	final_paths = get_paths(farm);
 	print_paths(*farm, final_paths);
 	ft_printf("\n\n");
