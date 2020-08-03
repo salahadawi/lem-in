@@ -105,7 +105,6 @@ void	texture_load_from_file(t_sdl *sdl, t_texture *texture, char *path)
 void	render_texture(t_sdl *sdl, t_texture *texture, int x, int y)
 {
 	SDL_Rect render_quad;
-	//check if texture is ant, not text
 	if (texture->width == 50)
 		render_quad = (SDL_Rect){x, y, texture->width * sdl->mods->zoom, texture->height * sdl->mods->zoom};
 	else
@@ -185,6 +184,13 @@ void	load_media(t_sdl *sdl, t_lem_in *lem_in)
 void	close_sdl(t_sdl *sdl)
 {
 	//free_texture_list
+	for (t_texture *tmp = sdl->textures->next; sdl->textures; tmp = sdl->textures->next)
+	{
+		free(sdl->textures);
+		sdl->textures = tmp;
+	}
+	free(sdl->mods);
+	free(sdl->mouse);
 	TTF_CloseFont(sdl->font);
 	TTF_Quit();
 	SDL_DestroyRenderer(sdl->renderer);
@@ -196,6 +202,7 @@ void	close_sdl(t_sdl *sdl)
 	free(sdl);
 	IMG_Quit();
 	SDL_Quit();
+	system("leaks visualizer");
 	exit(0);
 }
 
@@ -387,7 +394,7 @@ void	link_rooms(t_room **room1, t_room **room2)
 		link2 = new_link(*room1);
 	else
 	{
-		while (link2->next) // function to cycle link until end
+		while (link2->next)
 			link2 = link2->next;
 		link2->next = new_link(*room1);
 	}
@@ -442,14 +449,17 @@ void	save_ants_amount(t_lem_in *lem_in)
 		handle_error("Error in lem-in");
 	while (check_line_comment(line))
 	{
+		free(line);
 		if (get_next_line(0, &line) != 1)
 			handle_error("Error in lem-in");
 	}
 	lem_in->ants_amount = ft_atoi(line);
+	free(line);
 }
 
 int		save_command_room(t_lem_in *lem_in, t_room **room, char **line, int cmd)
 {
+	free(*line);
 	get_next_line(0, line);
 	if (*room)
 	{
@@ -491,9 +501,10 @@ char	*save_rooms(t_lem_in *lem_in)
 			}
 			else
 				break;
+			free(line);
 		}
-		//file->next = file_new(line);
-		//file = file->next;
+		else
+			free(line);
 	}
 	return (line);
 }
@@ -503,6 +514,7 @@ char	*save_links(t_lem_in *lem_in, char *line)
 
 	if (check_line_link(line))
 		save_links_to_rooms(lem_in, line);
+	free(line);
 	while (get_next_line(0, &line) > 0)
 	{
 		if (line[0] == 'L')
@@ -512,8 +524,7 @@ char	*save_links(t_lem_in *lem_in, char *line)
 			if (check_line_link(line))
 				save_links_to_rooms(lem_in, line);
 		}
-		//file->next = file_new(line);
-		//file = file->next;
+		free(line);
 	}
 	return (line);
 }
@@ -574,7 +585,6 @@ t_lem_in	*init_lem_in(void)
 
 	if (!(lem_in = (t_lem_in*)ft_memalloc(sizeof(t_lem_in))))
 		handle_error("Malloc failed");
-	lem_in->map = NULL;
 	lem_in->file = NULL;
 	lem_in->x_min = MAX_INT;
 	lem_in->y_min = MAX_INT;
@@ -598,13 +608,6 @@ int		scale(int n, int old[2], int new[2])
 
 void	scale_rooms(t_lem_in *lem_in)
 {
-	/*for (t_room *room = lem_in->first; room; room = room->next)
-	{
-		room->x_scaled = scale(room->x, (int[2]){lem_in->x_min, lem_in->x_max},
-		(int[2]){0, SCREEN_WIDTH});
-		room->y_scaled = scale(room->y, (int[2]){lem_in->y_min, lem_in->y_max},
-		(int[2]){0, SCREEN_HEIGHT});
-	}*/
 	for (t_room *room = lem_in->first; room; room = room->next)
 	{
 		room->x_scaled = room->x - lem_in->x_max / 2;
@@ -710,8 +713,6 @@ void	normalize_distances(t_lem_in *lem_in)
 	int i;
 
 	my_mergesort(&lem_in->first, SORT_ROOM_X);
-	//for (t_room *print = lem_in->first; print; print = print->next)
-		//ft_printf("SORTED_X: %s (%d.%d)\n", print->name, print->x, print->y);
 	i = 0;
 	for  (t_room *room = lem_in->first; room; room = room->next)
 	{
@@ -727,8 +728,6 @@ void	normalize_distances(t_lem_in *lem_in)
 	lem_in->x_max = i;
 	i = 0;
 	my_mergesort(&lem_in->first, SORT_ROOM_Y);
-	//for (t_room *print = lem_in->first; print; print = print->next)
-		//ft_printf("SORTED_Y: %s (%d.%d)\n", print->name, print->x, print->y);
 	i = 0;
 	for  (t_room *room = lem_in->first; room; room = room->next)
 	{
@@ -742,7 +741,6 @@ void	normalize_distances(t_lem_in *lem_in)
 	}
 	lem_in->y_min = 0;
 	lem_in->y_max = i;
-	//change room coordinates to be next to each other
 }
 
 t_ant	*new_ant(t_lem_in *lem_in, int i)
@@ -934,29 +932,21 @@ void	animate_ant_movement(t_lem_in *lem_in, t_file *file)
 	move_arr = ft_strsplit(file->line, ' ');
 	file->executed = 1;
 	ant =  NULL;
-	//for (int i = 0; move_arr[i]; i++)
-	//{
-		//ft_printf("%s\n", move_arr[i]);
-	//}
 	for (int i = 0; move_arr[i]; i++)
 	{
 		for (t_ant *tmp_ant = lem_in->ants; tmp_ant; tmp_ant = tmp_ant->next)
 		{
-			//ft_printf("ANT NUMBER %d ANT_NUM %d\n", tmp_ant->number, ft_atoi(&move_arr[i][1]));
 			if (tmp_ant->number == ft_atoi(&move_arr[i][1]))
 			{
 				ant = tmp_ant;
-				//ft_printf("CCCC\n");
 				break;
 			}
 		}
-		//ft_printf("TESTTEST\n");
 		if (!ant)
 		{
 			ft_printf("TESTAAAA\n");
 			break;
 		}
-		//ft_printf("%sTESTBBBB\n", ant->room->links->next->room->name);
 		for (t_link *room_link = ant->room->links; room_link; room_link = room_link->next)
 		{
 			ft_printf("Room: %s, link: %s\n", room_link->room->name, ft_strchr(move_arr[i], '-') + 1);
@@ -975,6 +965,10 @@ void	animate_ant_movement(t_lem_in *lem_in, t_file *file)
 			}
 		}
 	}
+	int i = 0;
+	while (move_arr[i])
+		free(move_arr[i++]);
+	free(move_arr);
 }
 
 void	move_ant(t_sdl *sdl, t_ant *ant)
@@ -991,15 +985,66 @@ void	move_ant(t_sdl *sdl, t_ant *ant)
 		if (ant->moves->next)
 			ant->moves = ant->moves->next;
 	}
-	//need algorith for line movement
-	/*if (ant->current_x > ant->room->x_scaled)
-		ant->current_x -= 1;
-	else if (ant->current_x < ant->room->x_scaled)
-		ant->current_x += 1;
-	if (ant->current_y > ant->room->y_scaled)
-		ant->current_y -= 1;
-	else if (ant->current_y < ant->room->y_scaled)
-		ant->current_y += 1;*/
+}
+
+	// t_room *tmp_room;
+	// t_link *tmp_link;
+
+	// free_file(&(*farm)->file_start);
+	// while ((*farm)->first)
+	// {
+	// 	tmp_room = (*farm)->first->next;
+	// 	while ((*farm)->first->links)
+	// 	{
+	// 		tmp_link = (*farm)->first->links->next;
+	// 		free ((*farm)->first->links);
+	// 		(*farm)->first->links = tmp_link;
+	// 	}
+	// 	free((*farm)->first->name);
+	// 	free((*farm)->first);
+	// 	(*farm)->first = tmp_room;
+	// }
+	// free(*farm);
+
+void	free_file(t_file **file)
+{
+	t_file *tmp;
+
+	while (*file)
+	{
+		tmp = (*file)->next;
+		free((*file)->line);
+		free((*file));
+		*file = tmp;
+	}
+}
+
+void free_memory(t_lem_in *lem_in)
+{
+	t_room *tmp_room;
+	t_link *tmp_link;
+
+	free_file(&lem_in->file);
+	for (t_ant *tmp = lem_in->ants->next; lem_in->ants; tmp = lem_in->ants->next)
+	{
+		free(lem_in->ants->texture);
+		free(lem_in->ants);
+		lem_in->ants = tmp;
+	}
+	while (lem_in->first)
+	{
+		tmp_room = lem_in->first->next;
+		while (lem_in->first->links)
+		{
+			tmp_link = lem_in->first->links->next;
+			free(lem_in->first->links);
+			lem_in->first->links = tmp_link;
+		}
+		free(lem_in->first->name);
+		free(lem_in->first);
+		lem_in->first = tmp_room;
+	}
+	free(lem_in);
 }
 
 int	main(int argc, char **argv)
@@ -1020,7 +1065,7 @@ int	main(int argc, char **argv)
 	init(sdl);
 	load_media(sdl, lem_in);
 	print_file(lem_in->file);
-	print_lem_in(lem_in);
+	//print_lem_in(lem_in);
 	while (1)
 	{
 		while (SDL_PollEvent(&sdl->e))
@@ -1091,11 +1136,7 @@ int	main(int argc, char **argv)
 			SDL_SetRenderDrawBlendMode(sdl->renderer, SDL_BLENDMODE_BLEND);
 			SDL_SetRenderDrawColor(sdl->renderer, 0xCC, 0xCC, 0xCC, 0x99);
 			for (t_link *link = room->links; link; link = link->next)
-			{
-				//ft_printf("link: %s-%s", room->name, link->room->name);
-				//ft_printf("link: (%d.%d) (%d.%d))\n", room->x_scaled, room->y_scaled, link->room->x_scaled, link->room->y_scaled);
 				SDL_RenderDrawLine(sdl->renderer, room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x + 25 * sdl->mods->zoom, room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y + 25 * sdl->mods->zoom, link->room->x_scaled * sdl->mods->zoom + sdl->mods->offset_x + 25 * sdl->mods->zoom, link->room->y_scaled * sdl->mods->zoom + sdl->mods->offset_y + 25 * sdl->mods->zoom);
-			}
 		}
 		for (t_room *room = lem_in->first; room; room = room->next)
 		{
@@ -1113,5 +1154,6 @@ int	main(int argc, char **argv)
 		}
 		SDL_RenderPresent(sdl->renderer);
 	}
+	free_memory(lem_in);
 	close_sdl(sdl);
 }
