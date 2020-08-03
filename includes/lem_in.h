@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/03 15:56:51 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/03 16:14:04 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -146,10 +146,6 @@ void				free_file(t_file **file);
 
 void				free_farm(t_farm **farm);
 
-int					optimal_room(t_link *links, t_ant **ant, t_farm *farm);
-
-int					optimal_room1(t_link *links, t_ant **ant, t_farm *farm);
-
 void				enqueue(t_link **queue, t_room *new_room);
 
 t_room				*dequeue(t_link **queue);
@@ -161,9 +157,6 @@ void				create_ants(t_farm *farm, t_ant **first);
 void				check_links_valid(t_farm **farm);
 
 void				move_ants(t_farm **farm);
-
-t_room				*find_next_optimal_room(t_link *links,
-t_ant *ant, t_farm *farm);
 
 int					count_ants_in_line(t_ant *ant, t_farm *farm);
 
@@ -178,5 +171,19 @@ void				find_weights(t_farm **farm, int weight, t_link *queue);
 int					free_queue(t_link *queue);
 
 void				save_paths(t_farm **farm);
+
+t_link				*assign_ant_path(t_farm *farm);
+
+void				mergesort_paths(t_path **paths);
+
+void				update_queue(t_link **queue, t_link *cur, t_link *links,
+						int num);
+
+int					free_two_queues(t_link *queue1, t_link *queue2);
+
+int					handle_end_found(t_farm *farm, t_room *neighbor,
+						t_link *path, int n);
+
+t_path				*create_path(t_link *path, int size);
 
 #endif

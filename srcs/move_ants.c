@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/07 18:56:21 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/24 14:48:57 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/03 16:06:03 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,69 +55,16 @@ void	move_ants(t_farm **farm)
 	ft_printf((ft_strchr(g_flags, 'v') ? "#Total moves: %d" : ""), moves);
 }
 
-int		optimal_room(t_link *links, t_ant **ant, t_farm *farm)
+t_link	*assign_ant_path(t_farm *farm)
 {
-	t_room	*optimal_room;
-	t_link	*tmp_link;
+	t_path	*paths;
 
-	tmp_link = links;
-	optimal_room = (*ant)->room;
-	while (links)
-	{
-		if (links->room->weight <= optimal_room->weight
-		&& !links->room->occupied)
-			optimal_room = links->room;
-		links = links->next;
-	}
-	if ((*ant)->room == optimal_room)
-		optimal_room = find_next_optimal_room(tmp_link, *ant, farm);
-	if ((*ant)->room == optimal_room)
-		return (0);
-	if ((*ant)->room != farm->start)
-		(*ant)->room->occupied = 0;
-	if ((*ant)->room == farm->start)
-		farm->start_ants_amount--;
-	(*ant)->room = optimal_room;
-	if ((*ant)->room != farm->end)
-		(*ant)->room->occupied = 1;
-	return (1);
-}
-
-t_room	*find_next_optimal_room(t_link *links, t_ant *ant, t_farm *farm)
-{
-	t_room *optimal_room;
-
-	optimal_room = ant->room;
-	while (links)
-	{
-		if (!links->room->occupied)
-			if (links->room->weight <= optimal_room->weight
-			+ farm->start_ants_amount - ant->room->weight)
-				optimal_room = links->room;
-		links = links->next;
-	}
-	return (optimal_room);
-}
-
-int		optimal_room1(t_link *links, t_ant **ant, t_farm *farm)
-{
-	t_room *optimal_room;
-
-	optimal_room = (*ant)->room;
-	while (links)
-	{
-		if (links->room->weight < optimal_room->weight
-		&& !links->room->occupied)
-			optimal_room = links->room;
-		links = links->next;
-	}
-	if ((*ant)->room == optimal_room)
-		return (0);
-	(*ant)->room->occupied = 0;
-	(*ant)->room = optimal_room;
-	if ((*ant)->room != farm->end)
-		(*ant)->room->occupied = 1;
-	return (1);
+	paths = farm->paths;
+	while (paths->next && paths->size + paths->ants_amount >=
+							paths->next->size + paths->next->ants_amount)
+		paths = paths->next;
+	paths->ants_amount++;
+	return (paths->path);
 }
 
 int		count_ants_in_line(t_ant *ant, t_farm *farm)
