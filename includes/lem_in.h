@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/27 15:51:08 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/03 15:56:51 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -175,7 +175,7 @@ int					room_in_links(t_room *room, t_link *link);
 
 void				find_weights(t_farm **farm, int weight, t_link *queue);
 
-void				free_queue(t_link *queue);
+int					free_queue(t_link *queue);
 
 void				save_paths(t_farm **farm);
 

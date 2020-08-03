@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 20:58:02 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/24 15:59:39 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/03 16:02:34 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -66,11 +66,10 @@ t_link	*assign_ant_path(t_farm *farm)
 
 	paths = farm->paths;
 	while (paths->next && paths->size + paths->ants_amount >=
-							  paths->next->size + paths->next->ants_amount)
+							paths->next->size + paths->next->ants_amount)
 		paths = paths->next;
 	paths->ants_amount++;
 	return (paths->path);
-	
 }
 
 t_ant	*new_ant(t_farm *farm, int *ant_number)

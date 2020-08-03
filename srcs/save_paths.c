@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/21 15:34:05 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/03 15:20:23 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/03 16:01:12 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,6 +70,13 @@ void	update_queue(t_link **queue, t_link *cur, t_link *links, int num)
 	}
 }
 
+int		free_two_queues(t_link *queue1, t_link *queue2)
+{
+	free_queue(queue1);
+	free_queue(queue2);
+	return (1);
+}
+
 int		get_flow_path(t_farm **farm, t_link *queue, t_link *path, int par_num)
 {
 	t_room	*neighbor;
@@ -90,17 +97,13 @@ int		get_flow_path(t_farm **farm, t_link *queue, t_link *path, int par_num)
 			if (!room_in_links(neighbor, visited) || neighbor == (*farm)->end)
 				update_queue(&queue, cur, links, par_num);
 			if (neighbor == (*farm)->end)
-			{
-				free_queue(queue);
-				free_queue(visited);
-				return (handle_end_found(*farm, neighbor, path, par_num));
-			}
-			links = links->next;
+				return (handle_end_found(*farm, neighbor, path, par_num) +
+					free_two_queues(queue, visited));
+				links = links->next;
 		}
 		enqueue(&visited, dequeue(&queue));
 	}
-	free_queue(visited);
-	return (0);
+	return (free_queue(visited));
 }
 
 t_path	*create_path(t_link *path, int size)

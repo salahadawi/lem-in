@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/07 18:54:30 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/22 14:29:21 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/03 15:56:45 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,7 +55,7 @@ void	init_queue(t_link **queue, t_link **visited, t_farm **farm)
 	enqueue(queue, (*farm)->start);
 }
 
-void	free_queue(t_link *queue)
+int		free_queue(t_link *queue)
 {
 	t_link	*next;
 
@@ -65,4 +65,5 @@ void	free_queue(t_link *queue)
 		free(queue);
 		queue = next;
 	}
+	return (0);
 }
