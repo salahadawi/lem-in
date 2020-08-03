@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 22:54:44 by sadawi            #+#    #+#             */
-/*   Updated: 2020/07/24 14:40:28 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/03 15:34:48 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,6 +26,8 @@ char	*get_flags(int argc, char **argv)
 		if (ft_strlen(argv[i]) != 2 || argv[i][0] != '-')
 		{
 			ft_fprintf(2, "Error: Invalid flag.\n");
+			if (ft_strchr(flags, 'x'))
+				system("leaks lem-in");
 			exit(0);
 		}
 		flags[i - 1] = argv[i][1];
@@ -55,5 +57,7 @@ int		main(int argc, char **argv)
 	move_ants(&farm);
 	free_farm(&farm);
 	free(g_flags);
+	if (ft_strchr(g_flags, 'x'))
+		system("leaks lem-in");
 	return (0);
 }
