@@ -6,12 +6,12 @@
 #    By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/02 18:52:09 by sadawi            #+#    #+#              #
-#    Updated: 2020/06/11 13:05:08 by sadawi           ###   ########.fr        #
+#    Updated: 2020/08/03 13:56:53 by sadawi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 SRCS = main.c
-LIBS = -lSDL2 -lSDL2_image -lSDL2_ttf ../libft/libft.a
+LIBS = -lSDL2 -lSDL2_image -lSDL2_ttf ../libft/libft.a -L lib
 NAME = visualizer
 FLAGS = -Wall -Werror -Wextra
 

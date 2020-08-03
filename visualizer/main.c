@@ -61,7 +61,7 @@ void	init(t_sdl *sdl)
 }
 
 void	free_texture(t_texture *texture)
-{	
+{
 	if (texture->texture)
 	{
 		SDL_DestroyTexture(texture->texture);
@@ -74,7 +74,7 @@ void	free_texture(t_texture *texture)
 void	load_from_rendered_text(t_sdl *sdl, t_texture *texture, char *text, SDL_Color text_color)
 {
 	SDL_Surface *text_surface;
-	
+
 	free_texture(texture);
 	if (!(text_surface = TTF_RenderText_Solid(sdl->font, text, text_color)))
 		handle_error("Unable to render text surface!");
@@ -142,7 +142,7 @@ void	load_media(t_sdl *sdl, t_lem_in *lem_in)
 			sdl->textures = texture;
 		}
 		else
-			texture->next = new_texture();	
+			texture->next = new_texture();
 		if (texture->next)
 			texture = texture->next;
 		if (room == lem_in->start)
@@ -311,7 +311,7 @@ void	get_line_room(t_lem_in *lem_in, t_room **room, char *line)
 	get_room_xy(room, line, &i);
 	if (!lem_in->first)
 		lem_in->first = (*room);
-	
+
 }
 
 int		check_line_link(char *line)
@@ -338,7 +338,7 @@ int		find_first_room_by_names(t_room **room, char *name1, char *name2)
 	if (ft_strequ((*room)->name, name1))
 		return (1);
 	else
-		return (2);	
+		return (2);
 }
 
 void	find_room_by_name(t_room **room, char *name)
@@ -690,7 +690,7 @@ t_room	*sorted_merge(t_room *first_half, t_room *second_half, int sorting_mode)
 	return NULL;
 }
 
-void	mergesort(t_room **room, int sorting_mode)
+void	my_mergesort(t_room **room, int sorting_mode)
 {
 	t_room *head;
 	t_room *first_half;
@@ -700,8 +700,8 @@ void	mergesort(t_room **room, int sorting_mode)
 	if (!head || !head->next)
 		return ;
 	split_list(head, &first_half, &second_half);
-	mergesort(&first_half, sorting_mode);
-	mergesort(&second_half, sorting_mode);
+	my_mergesort(&first_half, sorting_mode);
+	my_mergesort(&second_half, sorting_mode);
 	*room = sorted_merge(first_half, second_half, sorting_mode);
 }
 
@@ -709,7 +709,7 @@ void	normalize_distances(t_lem_in *lem_in)
 {
 	int i;
 
-	mergesort(&lem_in->first, SORT_ROOM_X);
+	my_mergesort(&lem_in->first, SORT_ROOM_X);
 	//for (t_room *print = lem_in->first; print; print = print->next)
 		//ft_printf("SORTED_X: %s (%d.%d)\n", print->name, print->x, print->y);
 	i = 0;
@@ -726,7 +726,7 @@ void	normalize_distances(t_lem_in *lem_in)
 	lem_in->x_min = 0;
 	lem_in->x_max = i;
 	i = 0;
-	mergesort(&lem_in->first, SORT_ROOM_Y);
+	my_mergesort(&lem_in->first, SORT_ROOM_Y);
 	//for (t_room *print = lem_in->first; print; print = print->next)
 		//ft_printf("SORTED_Y: %s (%d.%d)\n", print->name, print->x, print->y);
 	i = 0;
