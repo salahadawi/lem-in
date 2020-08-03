@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/02 18:53:51 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/03 17:05:48 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/03 18:20:00 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,6 @@ typedef	struct			s_lem_in
 	int					x_max;
 	int					y_min;
 	int					y_max;
-	t_room				**map;
 	t_file				*file;
 	t_room				*first;
 	t_room				*start;
