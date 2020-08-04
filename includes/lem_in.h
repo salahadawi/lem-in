@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/03 16:14:04 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/04 18:18:10 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -185,5 +185,13 @@ int					handle_end_found(t_farm *farm, t_room *neighbor,
 						t_link *path, int n);
 
 t_path				*create_path(t_link *path, int size);
+
+int					adjust_flow(t_room *room1, t_room *room2);
+
+void				get_flow_paths2(t_farm **farm);
+
+void				free_path(t_path *path);
+
+void				free_paths(t_farm **farm);
 
 #endif
