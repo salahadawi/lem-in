@@ -1,5 +1,4 @@
-
-#include "sdl.h"
+#include "sdl.hh"
 
 void	handle_error(char *message)
 {
@@ -597,12 +596,12 @@ t_lem_in	*init_lem_in(void)
 	return (lem_in);
 }
 
-int		scale(int n, int old[2], int new[2])
+int		scale(int n, int old[2], int new_num[2])
 {
 	int result;
 	if (!(old[1] - old[0]))
 		old[1]++;
-	result = (new[1] - new[0]) * (n - old[0]) / (old[1] - old[0]) + new[0];
+	result = (new_num[1] - new_num[0]) * (n - old[0]) / (old[1] - old[0]) + new_num[0];
 	return (result);
 }
 
@@ -808,6 +807,11 @@ void	plot_line_low(t_ant *ant, int x1, int y1, int x2, int y2)
 	int d;
 	t_move *move;
 
+	// for (t_move *tmp = ant->moves->next; ant->moves; tmp = ant->moves->next)
+	// {
+	// 	free(ant->moves);
+	// 	ant->moves = tmp;
+	// }
 	move = NULL;
 	dxy = (int[2]){x2 - x1, y2 - y1};
 	yi = 1;
@@ -848,8 +852,12 @@ void	plot_line_high(t_ant *ant, int x1, int y1, int x2, int y2)
 	int d;
 	t_move *move;
 
+	// for (t_move *tmp = ant->moves->next; ant->moves; tmp = ant->moves->next)
+	// {
+	// 	free(ant->moves);
+	// 	ant->moves = tmp;
+	// }
 	move = NULL;
-
 	dxy = (int[2]){x2 - x1, y2 - y1};
 	xi = 1;
 	if (dxy[0] < 0)
@@ -902,6 +910,11 @@ void	reverse_moves(t_move **moves)
 
 void	plot_line(t_ant *ant, int x1, int y1, int x2, int y2)
 {
+	for (t_move *tmp = ant->moves->next; ant->moves; tmp = ant->moves->next)
+	{
+		free(ant->moves);
+		ant->moves = tmp;
+	}
 	if (abs(y2 - y1) < abs(x2 - x1))
 	{
 		if (x1 > x2)
@@ -920,6 +933,7 @@ void	plot_line(t_ant *ant, int x1, int y1, int x2, int y2)
 		}
 		plot_line_high(ant, x1, y1, x2, y2);
 	}
+	//system("leaks visualizer");
 }
 
 void	animate_ant_movement(t_lem_in *lem_in, t_file *file)
@@ -944,7 +958,7 @@ void	animate_ant_movement(t_lem_in *lem_in, t_file *file)
 		}
 		if (!ant)
 		{
-			ft_printf("TESTAAAA\n");
+			ft_printf("No ants left!\n");
 			break;
 		}
 		for (t_link *room_link = ant->room->links; room_link; room_link = room_link->next)
@@ -977,34 +991,21 @@ void	move_ant(t_sdl *sdl, t_ant *ant)
 		return ;
 	ant->current_x = ant->moves->x;
 	ant->current_y = ant->moves->y;
-	ant->moves = ant->moves->next;
+	t_move *tmp = ant->moves->next;
+	free(ant->moves);
+	ant->moves = tmp;
 	for (int i = 0; i < sdl->mods->speed; i++)
 	{
 		if (!ant->moves)
 			break;
+		tmp = ant->moves->next;
 		if (ant->moves->next)
-			ant->moves = ant->moves->next;
+		{
+			free(ant->moves);
+			ant->moves = tmp;
+		}
 	}
 }
-
-	// t_room *tmp_room;
-	// t_link *tmp_link;
-
-	// free_file(&(*farm)->file_start);
-	// while ((*farm)->first)
-	// {
-	// 	tmp_room = (*farm)->first->next;
-	// 	while ((*farm)->first->links)
-	// 	{
-	// 		tmp_link = (*farm)->first->links->next;
-	// 		free ((*farm)->first->links);
-	// 		(*farm)->first->links = tmp_link;
-	// 	}
-	// 	free((*farm)->first->name);
-	// 	free((*farm)->first);
-	// 	(*farm)->first = tmp_room;
-	// }
-	// free(*farm);
 
 void	free_file(t_file **file)
 {
@@ -1027,6 +1028,11 @@ void free_memory(t_lem_in *lem_in)
 	free_file(&lem_in->file);
 	for (t_ant *tmp = lem_in->ants->next; lem_in->ants; tmp = lem_in->ants->next)
 	{
+		for (t_move *tmp = lem_in->ants->moves->next; lem_in->ants->moves; tmp = lem_in->ants->moves->next)
+		{
+			free(lem_in->ants->moves);
+			lem_in->ants->moves = tmp;
+		}
 		free(lem_in->ants->texture);
 		free(lem_in->ants);
 		lem_in->ants = tmp;
@@ -1049,6 +1055,7 @@ void free_memory(t_lem_in *lem_in)
 
 int	main(int argc, char **argv)
 {
+	int delay;
 	t_sdl	*sdl;
 	t_lem_in	*lem_in;
 
@@ -1066,10 +1073,12 @@ int	main(int argc, char **argv)
 	load_media(sdl, lem_in);
 	print_file(lem_in->file);
 	//print_lem_in(lem_in);
+	delay = 0;
 	while (1)
 	{
-		while (SDL_PollEvent(&sdl->e))
+		if (SDL_PollEvent(&sdl->e) && !delay)
 		{
+			delay = 1;
 			if (sdl->e.type == SDL_QUIT)
 				close_sdl(sdl);
 			else if (sdl->e.type == SDL_MOUSEWHEEL)
@@ -1126,6 +1135,7 @@ int	main(int argc, char **argv)
 				sdl->mouse->x = x;
 				sdl->mouse->y = y;
 			}
+			delay = 0;
 		}
 		animate_ant_movement(lem_in, lem_in->file);
 		SDL_SetRenderDrawColor(sdl->renderer, 0x77, 0x77, 0x77, 0xFF);
