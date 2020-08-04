@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 22:54:44 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/03 15:34:48 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/04 18:36:44 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -55,6 +55,7 @@ int		main(int argc, char **argv)
 	farm->start->occupied = 1;
 	save_paths(&farm);
 	move_ants(&farm);
+	ft_printf("ROOMS: %d\n", farm->rooms_amount);
 	free_farm(&farm);
 	free(g_flags);
 	if (ft_strchr(g_flags, 'x'))

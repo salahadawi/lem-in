@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/04 18:18:10 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/04 18:35:34 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -78,6 +78,7 @@ typedef	struct		s_farm
 	t_path			*paths;
 	int				paths_amount;
 	int				(*alg)(t_link*, t_ant**, struct s_farm*);
+	int				rooms_amount;
 }					t_farm;
 
 int					handle_error(char *message);

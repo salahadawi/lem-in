@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 23:09:11 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 20:46:25 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/04 18:36:06 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,7 @@ void	check_room_duplicates(t_farm **farm)
 			tmp = tmp->next;
 		}
 		room = room->next;
+		(*farm)->rooms_amount++;
 	}
 }
 
