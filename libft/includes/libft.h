@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/02/21 16:30:48 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/04 13:51:32 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -135,8 +135,6 @@ void				ft_putnbr_fd(int n, int fd);
 void				ft_lstdelone(t_list **alst, void (*del)(void *, size_t));
 
 void				ft_lstdel(t_list **alst, void (*del)(void *, size_t));
-
-void				ft_lstadd(t_list **alst, t_list *new);
 
 void				ft_lstiter(t_list *lst, void (*f)(t_list *elem));
 

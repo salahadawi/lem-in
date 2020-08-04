@@ -6,7 +6,7 @@
 #    By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2019/10/16 18:05:28 by sadawi            #+#    #+#              #
-#    Updated: 2020/02/21 17:02:00 by sadawi           ###   ########.fr        #
+#    Updated: 2020/08/04 13:51:12 by sadawi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,7 @@ NAME = libft.a
 
 CLIBFT = libft/ft_atoi.c libft/ft_bzero.c libft/ft_isalnum.c \
 libft/ft_isalpha.c libft/ft_isascii.c libft/ft_isdigit.c libft/ft_isprint.c \
-libft/ft_itoa.c libft/ft_lstadd.c libft/ft_lstdel.c libft/ft_lstdelone.c \
+libft/ft_itoa.c libft/ft_lstdel.c libft/ft_lstdelone.c \
 libft/ft_lstiter.c libft/ft_lstmap.c libft/ft_lstnew.c libft/ft_memalloc.c \
 libft/ft_memccpy.c libft/ft_memchr.c libft/ft_memcmp.c libft/ft_memcpy.c \
 libft/ft_memdel.c libft/ft_memmove.c libft/ft_memset.c libft/ft_putchar.c \
