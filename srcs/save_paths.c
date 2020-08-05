@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/21 15:34:05 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/03 16:14:20 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/05 13:08:51 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -105,7 +105,10 @@ void	get_paths(t_farm **farm)
 
 void	save_paths(t_farm **farm)
 {
-	get_flow_paths(farm);
+	if ((*farm)->rooms_amount < 30)
+		get_flow_paths2(farm);
+	else
+		get_flow_paths(farm);
 	get_paths(farm);
 	mergesort_paths(&(*farm)->paths);
 }
