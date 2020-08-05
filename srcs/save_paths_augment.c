@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/04 18:08:13 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/04 18:25:06 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/05 12:56:47 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -223,7 +223,8 @@ void	augment_path(t_farm **farm, t_link *new_path)
 		{
 			remove_path_flow(path->path);
 			tmp = path->next;
-			free_link(new_path);
+			//free_link(new_path);
+			free_path(path);
 			if (prev)
 				prev->next = tmp;
 			else
@@ -233,15 +234,28 @@ void	augment_path(t_farm **farm, t_link *new_path)
 		prev = path;
 		path = path->next;
 	}
-	free_link(new_path);
+	//free_link(new_path);
 }
 
 void	get_flow_paths2(t_farm **farm)
 {
+	t_path	*tmp;
 	t_link	*new_path;
 
 	while ((new_path = get_flow_path2(farm, NULL, NULL)))
+	{
 		augment_path(farm, new_path);
+		if (!(*farm)->paths)
+			(*farm)->paths = create_path(new_path, 0);
+		else
+		{
+			tmp = (*farm)->paths;
+			while (tmp->next)
+				tmp = tmp->next;
+			tmp->next = create_path(new_path, 0);
+			tmp = tmp->next;
+		}
+	}
 	free_paths(farm);
 }
 
