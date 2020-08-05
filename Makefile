@@ -6,7 +6,7 @@
 #    By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 19:26:38 by sadawi            #+#    #+#              #
-#    Updated: 2020/08/04 18:11:12 by sadawi           ###   ########.fr        #
+#    Updated: 2020/08/05 15:11:42 by sadawi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -14,7 +14,8 @@ NAME = lem-in
 CFILES = check_line.c find_room.c get_room_variables.c move_ants.c save_ants.c \
 save_rooms.c check_room_errors.c find_weights.c  handle_error.c print.c \
 save_input.c create_struct.c free_memory.c main.c queue.c save_links.c \
-save_paths.c mergesort.c path_helpers.c save_paths_augment.c
+save_paths.c mergesort.c path_helpers.c save_paths_augment.c \
+path_augment_helpers.c path_augment_helpers2.c
 SRCS = $(addprefix srcs/, $(CFILES))
 OBJS = $(addprefix objs/, $(notdir $(SRCS:.c=.o)))
 INCLUDES = -I includes -I libft/includes
