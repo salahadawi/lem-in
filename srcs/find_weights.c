@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/07 18:58:52 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 20:46:13 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/05 13:30:24 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,14 @@ int		room_in_links(t_room *room, t_link *link)
 	return (0);
 }
 
+void	init_queue2(t_link **queue, t_link **visited, t_farm **farm)
+{
+	*queue = NULL;
+	*visited = NULL;
+	(*farm)->end->weight = 0;
+	enqueue(queue, (*farm)->end);
+}
+
 void	find_weights(t_farm **farm, int weight, t_link *queue)
 {
 	t_room	*neighbor;
@@ -30,7 +38,7 @@ void	find_weights(t_farm **farm, int weight, t_link *queue)
 	t_link	*links;
 	t_link	*cur;
 
-	init_queue(&queue, &visited, farm);
+	init_queue2(&queue, &visited, farm);
 	while (queue)
 	{
 		cur = queue;
