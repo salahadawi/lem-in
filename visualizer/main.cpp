@@ -3,12 +3,14 @@
 void	handle_error(char *message)
 {
 	ft_printf("Visualizer: %s\n", message);
+	system("leaks visualizer");
 	exit(0);
 }
 
 void	handle_error_sdl(char *message)
 {
 	ft_printf("Visualizer: %s SDL_ERROR %s\n", message, SDL_GetError());
+	system("leaks visualizer");
 	exit(0);
 }
 
@@ -452,6 +454,8 @@ void	save_ants_amount(t_lem_in *lem_in)
 		if (get_next_line(0, &line) != 1)
 			handle_error("Error in lem-in");
 	}
+	if (!ft_isdigit(line[0]))
+		handle_error("Error in lem-in");
 	lem_in->ants_amount = ft_atoi(line);
 	free(line);
 }
