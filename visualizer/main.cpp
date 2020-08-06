@@ -3,14 +3,12 @@
 void	handle_error(char *message)
 {
 	ft_printf("Visualizer: %s\n", message);
-	system("leaks visualizer");
 	exit(0);
 }
 
 void	handle_error_sdl(char *message)
 {
 	ft_printf("Visualizer: %s SDL_ERROR %s\n", message, SDL_GetError());
-	system("leaks visualizer");
 	exit(0);
 }
 
@@ -159,32 +157,8 @@ void	load_media(t_sdl *sdl, t_lem_in *lem_in)
 	}
 }
 
-// Function to free the texture linked list
-/*void	free_texture_list(t_texture)
-{
-	t_room *tmp_room;
-	t_link *tmp_link;
-
-	free_file(&(*farm)->file_start);
-	while ((*farm)->first)
-	{
-		tmp_room = (*farm)->first->next;
-		while ((*farm)->first->links)
-		{
-			tmp_link = (*farm)->first->links->next;
-			free ((*farm)->first->links);
-			(*farm)->first->links = tmp_link;
-		}
-		free((*farm)->first->name);
-		free((*farm)->first);
-		(*farm)->first = tmp_room;
-	}
-	free(*farm);
-}*/
-
 void	close_sdl(t_sdl *sdl)
 {
-	//free_texture_list
 	for (t_texture *tmp = sdl->textures->next; sdl->textures; tmp = sdl->textures->next)
 	{
 		free(sdl->textures);
@@ -203,7 +177,6 @@ void	close_sdl(t_sdl *sdl)
 	free(sdl);
 	IMG_Quit();
 	SDL_Quit();
-	system("leaks visualizer");
 	exit(0);
 }
 
@@ -937,7 +910,6 @@ void	plot_line(t_ant *ant, int x1, int y1, int x2, int y2)
 		}
 		plot_line_high(ant, x1, y1, x2, y2);
 	}
-	//system("leaks visualizer");
 }
 
 void	animate_ant_movement(t_lem_in *lem_in, t_file *file)
