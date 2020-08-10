@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 22:54:44 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/05 14:04:24 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/10 16:05:37 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,6 +43,70 @@ void	print_visualizer_info(t_farm *farm)
 	ft_printf("%s %s\n", farm->start->name, farm->end->name);
 }
 
+int		get_lines_required(t_farm *farm)
+{
+	char *line;
+
+	if (farm->file_start && farm->file_start->next)
+		line = farm->file_start->next->line;
+	else
+		return (-1);
+	while (!ft_isdigit(*line) && *line)
+		line++;
+	return (ft_atoi(line));
+}
+
+void	reset_path_ants(t_farm *farm)
+{
+	t_path	*paths;
+
+	paths = farm->paths;
+	while (paths)
+	{
+		paths->ants_amount = 0;
+		paths = paths->next;
+	}
+}
+
+int		count_moves_done(t_farm *farm)
+{
+	t_path	*paths;
+	int		ants_amount;
+	int		total_moves;
+
+	ants_amount = farm->ants_amount;
+	while (ants_amount--)
+	{
+		paths = farm->paths;
+		while (paths->next && paths->size + paths->ants_amount >=
+							paths->next->size + paths->next->ants_amount)
+			paths = paths->next;
+		paths->ants_amount++;
+	}
+	total_moves = farm->paths->size + farm->paths->ants_amount - 1;
+	reset_path_ants(farm);
+	return (total_moves);
+}
+
+int		simulate_move_amount(t_farm *farm)
+{
+	int moves_required;
+	int	moves_made;
+
+	if (farm->paths->size < 2)
+		return (1);
+	moves_required = get_lines_required(farm);
+	moves_made = count_moves_done(farm);
+	ft_printf("REQUIRED: %d\n\n", moves_required);
+	ft_printf("MOVES MADE: %d\n\n", moves_made);
+	if ((moves_made - moves_required) > 10)
+	{
+		ft_printf("Too many moves made! Try another path.\n");
+		return (0);
+	}
+	return (1);
+}
+
 int		main(int argc, char **argv)
 {
 	t_farm *farm;
@@ -54,6 +118,8 @@ int		main(int argc, char **argv)
 	print_file(farm->file_start);
 	farm->start->occupied = 1;
 	save_paths(&farm);
+	if (!simulate_move_amount(farm))
+	 	exit(1);
 	move_ants(&farm);
 	free_farm(&farm);
 	free(g_flags);
