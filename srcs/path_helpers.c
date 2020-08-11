@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/03 16:11:46 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/03 16:12:24 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/11 20:44:06 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,7 +47,8 @@ int		handle_end_found(t_farm *farm, t_room *neighbor, t_link *path, int n)
 	while (neighbor->parent && !neighbor->parent->flow)
 	{
 		neighbor = neighbor->parent;
-		path = path->next;
+		if (path)
+			path = path->next;
 		if (neighbor->parent)
 			adjust_flow(neighbor, neighbor->parent);
 		if (neighbor != farm->start)
@@ -61,8 +62,7 @@ void	update_queue(t_link **queue, t_link *cur, t_link *links, int num)
 	t_room *neighbor;
 
 	neighbor = links->room;
-	if (neighbor->parent_num < num && (!neighbor->flow
-		|| links->flow == -1))
+	if (neighbor->parent_num < num && !(neighbor->flow && links->room->flow))
 	{
 		enqueue(queue, neighbor);
 		neighbor->parent = cur->room;
