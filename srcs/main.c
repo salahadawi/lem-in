@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 22:54:44 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/10 16:05:37 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/11 20:42:03 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,12 +96,19 @@ int		simulate_move_amount(t_farm *farm)
 	if (farm->paths->size < 2)
 		return (1);
 	moves_required = get_lines_required(farm);
+	if (!moves_required)
+		return (1);
 	moves_made = count_moves_done(farm);
-	ft_printf("REQUIRED: %d\n\n", moves_required);
-	ft_printf("MOVES MADE: %d\n\n", moves_made);
+	//ft_printf("#REQUIRED: %d\n", moves_required);
+	//ft_printf("#MOVES MADE: %d\n", moves_made);
 	if ((moves_made - moves_required) > 10)
 	{
-		ft_printf("Too many moves made! Try another path.\n");
+		//ft_printf("#Too many moves made! Try another path.\n");
+		if (!farm->fastest_paths || moves_made < farm->fastest_paths_moves)
+		{
+			farm->fastest_paths = farm->paths;
+			farm->fastest_paths_moves = moves_made;
+		}
 		return (0);
 	}
 	return (1);
@@ -111,15 +118,37 @@ int		main(int argc, char **argv)
 {
 	t_farm *farm;
 
+	clock_t start = clock();
+
 	g_flags = get_flags(argc, argv);
 	farm = save_input();
 	find_weights(&farm, 1, NULL);
 	check_links_valid(&farm);
 	print_file(farm->file_start);
 	farm->start->occupied = 1;
-	save_paths(&farm);
-	if (!simulate_move_amount(farm))
-	 	exit(1);
+	save_paths(&farm, 0);
+	while (farm->paths && !simulate_move_amount(farm))
+	{
+		remove_paths_flow(farm->paths);
+		farm->paths = NULL;
+		if ((double)(clock() - start) / CLOCKS_PER_SEC > 2)
+			break ;
+	 	save_paths(&farm, 1);
+	}
+	if (!farm->paths)
+	{
+		save_paths(&farm, 2);
+		while (farm->paths && !simulate_move_amount(farm))
+		{
+			remove_paths_flow(farm->paths);
+			farm->paths = NULL;
+			if ((double)(clock() - start) / CLOCKS_PER_SEC > 2.7)
+				break ;
+			save_paths(&farm, 2);
+		}
+	}
+	if (!farm->paths)
+		farm->paths = farm->fastest_paths;
 	move_ants(&farm);
 	free_farm(&farm);
 	free(g_flags);
