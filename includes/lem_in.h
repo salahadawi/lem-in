@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/05 15:11:17 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/11 20:11:10 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,7 @@
 # define LEM_IN_H
 
 # include "../libft/includes/libft.h"
+# include <time.h>
 
 # define START		1
 # define END		2
@@ -76,6 +77,8 @@ typedef	struct		s_farm
 	t_room			*end;
 	t_room			*first;
 	t_path			*paths;
+	t_path			*fastest_paths;
+	int				fastest_paths_moves;
 	int				paths_amount;
 	int				(*alg)(t_link*, t_ant**, struct s_farm*);
 	int				rooms_amount;
@@ -171,7 +174,7 @@ void				find_weights(t_farm **farm, int weight, t_link *queue);
 
 int					free_queue(t_link *queue);
 
-void				save_paths(t_farm **farm);
+void				save_paths(t_farm **farm, int mode);
 
 t_link				*assign_ant_path(t_farm *farm);
 
@@ -213,5 +216,13 @@ int					check_path(t_room *neighbor, t_link *links);
 
 t_link				*handle_end_found2(t_farm **farm, t_room *neighbor,
 					t_link *q1, t_link *q2);
+
+int					simulate_move_amount(t_farm *farm);
+
+void				remove_paths_flow(t_path *path);
+
+int					create_nonoptimal_path(t_farm **farm, t_link *queue, t_link *path, int par_num);
+
+int					reset_parent_num(t_farm **farm, t_link *queue, t_link *path, int par_num);
 
 #endif
