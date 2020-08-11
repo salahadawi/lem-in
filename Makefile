@@ -6,7 +6,7 @@
 #    By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/04/10 19:26:38 by sadawi            #+#    #+#              #
-#    Updated: 2020/08/05 15:11:42 by sadawi           ###   ########.fr        #
+#    Updated: 2020/08/11 14:05:44 by sadawi           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -46,3 +46,13 @@ fclean: clean
 	@echo Clean successful!
 
 re: fclean all
+
+noflags:
+	@echo Compiling...
+	@rm -rf objs
+	@gcc -O3 $(INCLUDES) -c $(SRCS)
+	@mkdir objs
+	@mv $(notdir $(SRCS:.c=.o)) objs
+	@gcc -O3 $(INCLUDES) -o $(NAME) $(OBJS) libft/libft.a
+	@echo $(NAME) compiled succesfully!
+
