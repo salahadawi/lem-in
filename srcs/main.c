@@ -110,8 +110,6 @@ int		simulate_move_amount(t_farm *farm)
 	if (!moves_required)
 		return (1);
 	moves_made = count_moves_done(farm);
-	//ft_printf("#REQUIRED: %d\n", moves_required);
-	//ft_printf("#MOVES MADE: %d\n", moves_made);
 	if (!farm->fastest_paths || moves_made < farm->fastest_paths_moves)
 	{
 		if (farm->fastest_paths)
@@ -122,52 +120,69 @@ int		simulate_move_amount(t_farm *farm)
 	else
 		free_paths(farm->paths);
 	if ((moves_made - moves_required) > 10)
-	{
-		//ft_printf("#Too many moves made! Try another path.\n");
 		return (0);
-	}
 	return (1);
+}
+
+void	optimize_paths(t_farm *farm)
+{
+	while (farm->paths)
+	{
+		remove_paths_flow(farm->paths);
+		simulate_move_amount(farm);
+		farm->paths = NULL;
+		if ((double)(clock() - farm->timer)
+			/ CLOCKS_PER_SEC > farm->seconds - 1.3)
+			break ;
+		save_paths(&farm, 1);
+	}
+	save_paths(&farm, 2);
+	while (farm->paths)
+	{
+		remove_paths_flow(farm->paths);
+		simulate_move_amount(farm);
+		farm->paths = NULL;
+		if ((double)(clock() - farm->timer)
+			/ CLOCKS_PER_SEC > farm->seconds - 0.6)
+			break ;
+		save_paths(&farm, 2);
+	}
+	if (!farm->paths)
+		farm->paths = farm->fastest_paths;
+}
+
+void	print_info(t_farm *farm)
+{
+	int	lines_required;
+
+	if (ft_strchr(g_flags, 'd'))
+	{
+		lines_required = get_lines_required(farm);
+		if (lines_required != -1)
+			ft_printf("#Here is the number of lines required: %d\n",
+			lines_required);
+		ft_printf("#Amount of moves made: %d\n", farm->moves_done);
+		if (lines_required != -1)
+			ft_printf("#Difference: %+d\n", farm->moves_done - lines_required);
+	}
+	else if (ft_strchr(g_flags, 'v'))
+		ft_printf("#Total moves: %d\n", farm->moves_done);
 }
 
 int		main(int argc, char **argv)
 {
 	t_farm *farm;
 
-	farm = save_input();
-	g_flags = get_flags(farm, argc, argv); //check memory leaks with invalid flags
+	farm = save_input(argc, argv);
 	find_weights(&farm, 1, NULL);
 	check_links_valid(&farm);
 	print_file(farm->file_start);
 	farm->start->occupied = 1;
 	save_paths(&farm, 0);
-	if (farm->seconds)
-	{
-		while (farm->paths)
-		{
-			remove_paths_flow(farm->paths);
-			simulate_move_amount(farm);
-			farm->paths = NULL;
-			if ((double)(clock() - farm->timer) / CLOCKS_PER_SEC > farm->seconds - 1.3)
-				break ;
-			save_paths(&farm, 1);
-		}
-		if (!farm->paths)
-		{
-			save_paths(&farm, 2);
-			while (farm->paths)
-			{
-				remove_paths_flow(farm->paths);
-				simulate_move_amount(farm);
-				farm->paths = NULL;
-				if ((double)(clock() - farm->timer) / CLOCKS_PER_SEC > farm->seconds -  0.6)
-					break ;
-				save_paths(&farm, 2);
-			}
-		}
-		if (!farm->paths)
-			farm->paths = farm->fastest_paths;
-	}
+	if (farm->seconds && farm->rooms_amount > 30)
+		optimize_paths(farm);
 	move_ants(&farm);
+	print_info(farm);
 	free_farm(&farm);
 	free(g_flags);
 	if (ft_strchr(g_flags, 'x'))
