@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/12 15:53:15 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/12 18:31:34 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ typedef	struct		s_farm
 	int				rooms_amount;
 	clock_t			timer;
 	double			seconds;
+	int				moves_done;
 }					t_farm;
 
 int					handle_error(char *message);
@@ -142,7 +143,7 @@ void				save_links_to_rooms(t_farm **farm, char *line);
 
 void				save_links(t_farm **farm, char *line);
 
-t_farm				*save_input(void);
+t_farm				*save_input(int argc, char **argv);
 
 void				print_farm(t_farm *farm);
 
@@ -222,5 +223,7 @@ t_link				*handle_end_found2(t_farm **farm, t_room *neighbor,
 int					simulate_move_amount(t_farm *farm);
 
 void				remove_paths_flow(t_path *path);
+
+char				*get_flags(t_farm *farm, int argc, char **argv);
 
 #endif
