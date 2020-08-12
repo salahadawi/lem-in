@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 22:54:16 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/03 15:32:00 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/12 16:03:32 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,22 +25,22 @@ void	free_file(t_file **file)
 	}
 }
 
-void	free_paths(t_farm **farm)
+void	free_paths(t_path *paths)
 {
 	t_path *tmp_path;
 	t_link *tmp_link;
 
-	while ((*farm)->paths)
+	while (paths)
 	{
-		while ((*farm)->paths->path)
+		while (paths->path)
 		{
-			tmp_link = (*farm)->paths->path->next;
-			free((*farm)->paths->path);
-			(*farm)->paths->path = tmp_link;
+			tmp_link = paths->path->next;
+			free(paths->path);
+			paths->path = tmp_link;
 		}
-		tmp_path = (*farm)->paths->next;
-		free((*farm)->paths);
-		(*farm)->paths = tmp_path;
+		tmp_path = paths->next;
+		free(paths);
+		paths = tmp_path;
 	}
 }
 
@@ -50,7 +50,7 @@ void	free_farm(t_farm **farm)
 	t_link *tmp_link;
 
 	free_file(&(*farm)->file_start);
-	free_paths(farm);
+	free_paths((*farm)->paths);
 	while ((*farm)->first)
 	{
 		tmp_room = (*farm)->first->next;

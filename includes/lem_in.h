@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/11 20:11:10 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/12 15:53:15 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -196,7 +196,7 @@ void				get_flow_paths2(t_farm **farm);
 
 void				free_path(t_path *path);
 
-void				free_paths(t_farm **farm);
+void				free_paths(t_path *paths);
 
 void				remove_flow(t_room *room1, t_room *room2);
 

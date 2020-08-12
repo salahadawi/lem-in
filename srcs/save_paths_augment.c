@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/08/04 18:08:13 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/05 15:10:01 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/12 15:53:45 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -123,5 +123,5 @@ void	get_flow_paths2(t_farm **farm)
 			tmp = tmp->next;
 		}
 	}
-	free_paths(farm);
+	free_paths((*farm)->paths);
 }
