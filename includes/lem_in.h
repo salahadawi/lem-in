@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/10/17 16:27:35 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/12 18:31:34 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/12 18:59:33 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -225,5 +225,27 @@ int					simulate_move_amount(t_farm *farm);
 void				remove_paths_flow(t_path *path);
 
 char				*get_flags(t_farm *farm, int argc, char **argv);
+
+void				print_info(t_farm *farm);
+
+void				print_visualizer_info(t_farm *farm);
+
+void				handle_flag_error(char *flags);
+
+int					get_lines_required(t_farm *farm);
+
+void				get_flow_paths(t_farm **farm, int mode);
+
+void				remove_paths_flow(t_path *path);
+
+int					free_queue_and_increment(t_link *queue, int *i, int *j);
+
+t_link				*get_cur_and_links(t_link *queue, t_link **links);
+
+int					get_flow_path(t_farm **farm, t_link *queue,
+						t_link *path, int par_num);
+
+int					get_flow_path3(t_farm **farm, t_link *queue,
+						t_link *path, int par_num);
 
 #endif
