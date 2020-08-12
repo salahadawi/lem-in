@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/04/07 18:56:21 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/05 18:46:20 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/12 16:20:10 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -52,7 +52,7 @@ void	move_ants(t_farm **farm)
 		}
 		ft_printf("\n", moves++);
 	}
-	ft_printf((ft_strchr(g_flags, 'v') ? "#Total moves: %d\n" : ""), moves);
+	(*farm)->moves_done = moves;
 }
 
 t_link	*assign_ant_path(t_farm *farm)
