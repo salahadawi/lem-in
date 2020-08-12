@@ -60,6 +60,8 @@ int		get_lines_required(t_farm *farm)
 		line = farm->file_start->next->line;
 	else
 		return (-1);
+	if (!ft_strstr(line, "#Here is the number of lines required:"))
+		return (-1);
 	while (!ft_isdigit(*line) && *line)
 		line++;
 	return (ft_atoi(line));
