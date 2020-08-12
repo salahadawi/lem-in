@@ -6,13 +6,21 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 22:54:44 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/12 16:02:23 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/12 18:33:35 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lem_in.h"
 
 char *g_flags = "\0";
+
+void	handle_flag_error(char *flags)
+{
+	ft_fprintf(2, "Error: Invalid flag.\n");
+	if (ft_strchr(flags, 'x'))
+		system("leaks lem-in");
+	exit(0);
+}
 
 char	*get_flags(t_farm *farm, int argc, char **argv)
 {
@@ -24,23 +32,13 @@ char	*get_flags(t_farm *farm, int argc, char **argv)
 	while (i < argc)
 	{
 		if (ft_strlen(argv[i]) != 2 || argv[i][0] != '-')
-		{
-			ft_fprintf(2, "Error: Invalid flag.\n");
-			if (ft_strchr(flags, 'x'))
-				system("leaks lem-in");
-			exit(0);
-		}
+			handle_flag_error(flags);
 		flags[i - 1] = argv[i][1];
 		i++;
 		if (argv[i - 1][1] == 't' && i < argc)
 		{
 			if (!ft_isdigit(argv[i][0]))
-			{
-				ft_fprintf(2, "Error: Invalid flag.\n");
-				if (ft_strchr(flags, 'x'))
-					system("leaks lem-in");
-				exit(0);
-			}
+				handle_flag_error(flags);
 			farm->seconds = (double)ft_atoi(argv[i++]);
 		}
 	}
