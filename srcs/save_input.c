@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 17:18:53 by sadawi            #+#    #+#             */
-/*   Updated: 2020/04/07 20:45:53 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/12 18:30:49 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,12 +29,13 @@ void	save_line_file(t_farm **farm, char *line)
 	}
 }
 
-t_farm	*save_input(void)
+t_farm	*save_input(int argc, char **argv)
 {
 	t_farm	*farm;
 	char	*line;
 
 	init_farm(&farm);
+	g_flags = get_flags(farm, argc, argv);
 	save_ants_amount(&farm);
 	line = save_rooms(&farm);
 	check_room_errors(&farm);
