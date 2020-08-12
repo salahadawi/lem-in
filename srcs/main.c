@@ -112,14 +112,18 @@ int		simulate_move_amount(t_farm *farm)
 	moves_made = count_moves_done(farm);
 	//ft_printf("#REQUIRED: %d\n", moves_required);
 	//ft_printf("#MOVES MADE: %d\n", moves_made);
+	if (!farm->fastest_paths || moves_made < farm->fastest_paths_moves)
+	{
+		if (farm->fastest_paths)
+			free_paths(farm->fastest_paths);
+		farm->fastest_paths = farm->paths;
+		farm->fastest_paths_moves = moves_made;
+	}
+	else
+		free_paths(farm->paths);
 	if ((moves_made - moves_required) > 10)
 	{
 		//ft_printf("#Too many moves made! Try another path.\n");
-		if (!farm->fastest_paths || moves_made < farm->fastest_paths_moves)
-		{
-			farm->fastest_paths = farm->paths;
-			farm->fastest_paths_moves = moves_made;
-		}
 		return (0);
 	}
 	return (1);
