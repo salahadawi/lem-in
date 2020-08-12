@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/07/21 15:34:05 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/11 20:47:00 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/12 17:49:12 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,85 +47,79 @@ void	remove_paths_flow(t_path *path)
 	}
 }
 
+int		free_queue_and_increment(t_link *queue, int *i, int *j)
+{
+	(*i)++;
+	(*j) = 0;
+	free_queue(queue);
+	return (0);
+}
+
+t_link	*get_cur_and_links(t_link *queue, t_link **links)
+{
+	t_link *cur;
+
+	cur = queue;
+	while (cur->next)
+		cur = cur->next;
+	*links = cur->room->links;
+	return (cur);
+}
+
 int		get_flow_path3(t_farm **farm, t_link *queue, t_link *path, int par_num)
 {
-	t_room	*neighbor;
-	t_link	*visited;
-	t_link	*links;
-	t_link	*cur;
+	t_room		*neighbor;
+	t_link		*visited;
+	t_link		*links;
+	t_link		*cur;
+	static int	i[2];
 
-	static int i = 0;
-	static int j = 0;
 	init_queue(&queue, &visited, farm);
 	while (queue)
 	{
-		cur = queue;
-		while (cur->next)
-			cur = cur->next;
-		links = cur->room->links;
+		cur = get_cur_and_links(queue, &links);
 		while (links)
 		{
 			neighbor = links->room;
 			if (!room_in_links(neighbor, visited) || neighbor == (*farm)->end)
 				update_queue(&queue, cur, links, par_num);
-			if (neighbor == (*farm)->end)
-			{
-				enqueue(&queue, neighbor);
-				neighbor->parent = cur->room;
-				neighbor->parent_num = par_num;
-			}
-			if (neighbor == (*farm)->end && j++ > i)
-			{
-				return (handle_end_found(*farm, neighbor, path, par_num) +
-					free_two_queues(queue, visited));
-			}
-			links = links->next;
+			if (neighbor == (*farm)->end && i[1]++ > i[0])
+				return (handle_end_found(*farm, neighbor, path, par_num)
+					+ free_two_queues(queue, visited));
+				links = links->next;
 		}
 		enqueue(&visited, dequeue(&queue));
 	}
-	i++;
-	j = 0;
-	return (free_queue(visited));
+	return (free_queue_and_increment(visited, &(i[0]), &i[1]));
 }
-
 
 int		get_flow_path(t_farm **farm, t_link *queue, t_link *path, int par_num)
 {
-	t_room	*neighbor;
-	t_link	*visited;
-	t_link	*links;
-	t_link	*cur;
+	t_room		*neighbor;
+	t_link		*visited;
+	t_link		*links;
+	t_link		*cur;
+	static int	i[2];
 
-	static int i = 0;
-	static int j = 0;
 	init_queue(&queue, &visited, farm);
 	while (queue)
 	{
-		cur = queue;
-		while (cur->next)
-			cur = cur->next;
-		links = cur->room->links;
-			if (j++ < i)
-			{
-				links = links->next;
-			}
+		cur = get_cur_and_links(queue, &links);
+		if (i[1]++ < i[0])
+			links = links->next;
 		while (links)
 		{
 			neighbor = links->room;
 			if (!room_in_links(neighbor, visited) || neighbor == (*farm)->end)
 				update_queue(&queue, cur, links, par_num);
 			if (neighbor == (*farm)->end)
-			{
 				return (handle_end_found(*farm, neighbor, path, par_num) +
 					free_two_queues(queue, visited));
-			}
-			links = links->next;
+				links = links->next;
 		}
 		enqueue(&visited, dequeue(&queue));
 	}
-	i++;
-	j = 0;
-	return (free_queue(visited));
+	return (free_queue_and_increment(visited, &(i[0]), &i[1]));
 }
 
 void	get_flow_paths(t_farm **farm, int mode)
@@ -162,11 +156,6 @@ t_path	*find_path(t_farm **farm, t_link *links)
 		else
 			links = links->next;
 	}
-	path = cur_head;
-	while (path->next)
-		path = path->next;
-	if (path->room != (*farm)->end)
-		return (NULL);
 	return (create_path(cur_head, size));
 }
 
@@ -183,18 +172,15 @@ void	get_paths(t_farm **farm)
 		if (links->flow)
 		{
 			found_path = find_path(farm, links);
-			if (found_path)
+			if ((*farm)->paths)
 			{
-				if ((*farm)->paths)
-				{
-					tmp->next = found_path;
-					tmp = tmp->next;
-				}
-				else
-				{
-					tmp = found_path;
-					(*farm)->paths = tmp;
-				}
+				tmp->next = found_path;
+				tmp = tmp->next;
+			}
+			else
+			{
+				tmp = found_path;
+				(*farm)->paths = tmp;
 			}
 		}
 		links = links->next;
