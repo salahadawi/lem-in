@@ -133,37 +133,40 @@ int		main(int argc, char **argv)
 {
 	t_farm *farm;
 
-	clock_t start = clock();
-
-	g_flags = get_flags(argc, argv);
 	farm = save_input();
+	g_flags = get_flags(farm, argc, argv); //check memory leaks with invalid flags
 	find_weights(&farm, 1, NULL);
 	check_links_valid(&farm);
 	print_file(farm->file_start);
 	farm->start->occupied = 1;
 	save_paths(&farm, 0);
-	while (farm->paths && !simulate_move_amount(farm))
+	if (farm->seconds)
 	{
-		remove_paths_flow(farm->paths);
-		farm->paths = NULL;
-		if ((double)(clock() - start) / CLOCKS_PER_SEC > 2)
-			break ;
-	 	save_paths(&farm, 1);
-	}
-	if (!farm->paths)
-	{
-		save_paths(&farm, 2);
-		while (farm->paths && !simulate_move_amount(farm))
+		while (farm->paths)
 		{
 			remove_paths_flow(farm->paths);
+			simulate_move_amount(farm);
 			farm->paths = NULL;
-			if ((double)(clock() - start) / CLOCKS_PER_SEC > 2.7)
+			if ((double)(clock() - farm->timer) / CLOCKS_PER_SEC > farm->seconds - 1.3)
 				break ;
-			save_paths(&farm, 2);
+			save_paths(&farm, 1);
 		}
+		if (!farm->paths)
+		{
+			save_paths(&farm, 2);
+			while (farm->paths)
+			{
+				remove_paths_flow(farm->paths);
+				simulate_move_amount(farm);
+				farm->paths = NULL;
+				if ((double)(clock() - farm->timer) / CLOCKS_PER_SEC > farm->seconds -  0.6)
+					break ;
+				save_paths(&farm, 2);
+			}
+		}
+		if (!farm->paths)
+			farm->paths = farm->fastest_paths;
 	}
-	if (!farm->paths)
-		farm->paths = farm->fastest_paths;
 	move_ants(&farm);
 	free_farm(&farm);
 	free(g_flags);
