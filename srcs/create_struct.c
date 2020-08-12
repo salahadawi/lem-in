@@ -6,7 +6,7 @@
 /*   By: sadawi <sadawi@student.hive.fi>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/03/25 20:58:02 by sadawi            #+#    #+#             */
-/*   Updated: 2020/08/03 16:06:55 by sadawi           ###   ########.fr       */
+/*   Updated: 2020/08/12 15:44:27 by sadawi           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,12 +48,17 @@ t_link	*new_link(t_room *room)
 
 void	init_farm(t_farm **farm)
 {
+	clock_t time;
+
+	time = clock();
 	(*farm) = (t_farm*)ft_memalloc(sizeof(t_farm));
 	(*farm)->file_start = NULL;
 	(*farm)->file_end = NULL;
 	(*farm)->start = NULL;
 	(*farm)->end = NULL;
 	(*farm)->first = NULL;
+	(*farm)->seconds = 3;
+	(*farm)->timer = time;
 }
 
 t_ant	*new_ant(t_farm *farm, int *ant_number)
